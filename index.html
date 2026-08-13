@@ -106,24 +106,18 @@
 </section>
 
 <!-- ③ 对比实验区 -->
+<!-- ③ 差异化优势 -->
 <section class="compare" id="compare">
   <div class="container">
-    <h2 class="sec-title">同一道题，差别在哪？</h2>
-    <p class="sec-sub">测试题：计算 ∫₋₁¹ 1/x² dx（含间断点的瑕积分陷阱题）</p>
-    <div class="vs-wrap">
-      <div class="vs-box vs-bad">
-        <h4>✗ 通用大模型</h4>
-        <!-- ★有截图后：删掉下面这个 div，换成 <img src="对比-通用模型.png"> 并把图片文件一起上传到仓库 -->
-        <div class="shot">此处放通用大模型回答截图<br>（直接套牛顿-莱布尼茨公式，错误答案 -2）</div>
-        <p style="font-size:13px;margin-top:10px;color:#a06848">无视 x=0 处的间断点，直接套公式得出 -2，未检验定理使用条件。</p>
-      </div>
-      <div class="vs-mark">VS</div>
-      <div class="vs-box vs-good">
-        <h4>✓ 微积分错题诊疗师</h4>
-        <!-- ★同上，换成 <img src="对比-诊疗师.png"> -->
-        <div class="shot">此处放本智能体回答截图<br>（识别瑕点、判定发散、引用知识库卡片）</div>
-        <p style="font-size:13px;margin-top:10px;color:#3d7a50">识别瑕点并判定积分发散，引用私有知识库"牛顿-莱布尼茨公式使用条件"卡片，并预判典型错误路径。</p>
-      </div>
+    <h2 class="sec-title">通用大模型能解题，为什么还需要它？</h2>
+    <p class="sec-sub">解题能力早已不是差距，真正的差距在"是否认识这个学生"</p>
+    <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+      <div class="card"><div class="icon">🧠</div><h3>通用大模型没有记忆</h3>
+        <p>对话一关就忘。它不知道你上周在泰勒展开上错过三次，也不会在你第三次犯同样错误时提醒你。本系统的错题本让每个学生拥有持续积累的学习档案。</p></div>
+      <div class="card"><div class="icon">🎯</div><h3>答案对了 ≠ 真懂</h3>
+        <p>通用大模型只对答案负责。本系统强制要求展示解题过程，能识别"结果碰巧正确但逻辑断裂"的假掌握——这正是教师批改中最耗时、AI最有价值的环节。</p></div>
+      <div class="card"><div class="icon">📚</div><h3>对齐课程而非全网</h3>
+        <p>私有知识库按课程教学大纲和易错点建设，经数学专业人工校验。复习建议精确到"课本哪一章哪个定理"，而不是泛泛的全网知识。</p></div>
     </div>
   </div>
 </section>
