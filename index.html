@@ -8,72 +8,113 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-         background: #0d1b2e; color: #e8eef5; line-height: 1.7; overflow-x: hidden; }
+         background: #0a1420; color: #e8eef5; line-height: 1.7; overflow-x: hidden; }
   .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
 
-  /* ===== Hero 动态背景 ===== */
-  .hero { position: relative; min-height: 92vh; display: flex; align-items: center;
+  /* ===== Hero ===== */
+  .hero { position: relative; min-height: 95vh; display: flex; align-items: center;
           justify-content: center; text-align: center; overflow: hidden;
-          background: linear-gradient(-45deg, #0d1b2e, #1e3c5a, #2c5f8a, #16324f);
-          background-size: 400% 400%; animation: gradientMove 14s ease infinite; }
+          background: linear-gradient(-45deg, #0a1420, #16324f, #2c5f8a, #0f2237, #1e4a6e);
+          background-size: 500% 500%; animation: gradientMove 10s ease infinite; }
   @keyframes gradientMove {
-    0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; }
+    0% { background-position: 0% 50%; } 25% { background-position: 100% 0%; }
+    50% { background-position: 100% 100%; } 75% { background-position: 0% 100%; }
     100% { background-position: 0% 50%; } }
-  /* 漂浮数学符号 */
-  .math-float { position: absolute; color: rgba(255,255,255,.07); user-select: none;
-                font-size: 90px; animation: floaty 10s ease-in-out infinite; }
+
+  /* 发光光晕 */
+  .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5;
+          animation: glowPulse 6s ease-in-out infinite; }
+  .glow1 { width: 480px; height: 480px; background: #ff8c42; top: -120px; left: -120px; }
+  .glow2 { width: 520px; height: 520px; background: #2e7fb8; bottom: -160px; right: -100px;
+           animation-delay: 3s; }
+  @keyframes glowPulse { 0%,100% { opacity: .35; transform: scale(1); }
+                         50% { opacity: .6; transform: scale(1.15); } }
+
+  /* 漂浮数学符号：更大、更多、更明显 */
+  .math-float { position: absolute; color: rgba(160, 210, 255, .22); user-select: none;
+                text-shadow: 0 0 24px rgba(120,190,255,.5); z-index: 1;
+                animation: floaty 8s ease-in-out infinite; }
+  .math-float.orange { color: rgba(255, 170, 110, .20); text-shadow: 0 0 24px rgba(255,150,80,.5); }
   @keyframes floaty {
-    0%,100% { transform: translateY(0) rotate(-6deg); }
-    50% { transform: translateY(-36px) rotate(6deg); } }
+    0%   { transform: translate(0, 0) rotate(-10deg); opacity: .5; }
+    25%  { opacity: 1; }
+    50%  { transform: translate(24px, -60px) rotate(10deg); opacity: .7; }
+    75%  { opacity: 1; }
+    100% { transform: translate(0, 0) rotate(-10deg); opacity: .5; } }
+
   .hero-inner { position: relative; z-index: 2; padding: 60px 20px; }
   .badge { display: inline-block; background: rgba(255,140,66,.15);
-           border: 1px solid rgba(255,140,66,.5); color: #ffb273; border-radius: 999px;
-           padding: 6px 20px; font-size: 13px; letter-spacing: 2px; margin-bottom: 28px;
-           backdrop-filter: blur(6px); }
-  .hero h1 { font-size: clamp(30px, 7vw, 56px); font-weight: 800; letter-spacing: 3px;
-             background: linear-gradient(90deg, #ffffff, #ffd8b0, #8fc7ee);
-             -webkit-background-clip: text; background-clip: text; color: transparent;
-             margin-bottom: 18px; }
-  .hero .sub { font-size: clamp(14px, 3vw, 18px); color: #b9cddd; margin-bottom: 40px; }
-  .btn { display: inline-block; padding: 14px 38px; border-radius: 999px; font-size: 16px;
-         text-decoration: none; margin: 6px; transition: .25s; }
-  .btn-primary { background: linear-gradient(90deg, #ff8c42, #ff6b4a); color: #fff;
-                 font-weight: bold; box-shadow: 0 0 24px rgba(255,140,66,.45); }
-  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 32px rgba(255,140,66,.65); }
-  .btn-ghost { border: 1.5px solid rgba(255,255,255,.5); color: #fff; }
-  .btn-ghost:hover { background: rgba(255,255,255,.12); transform: translateY(-3px); }
+           border: 1px solid rgba(255,140,66,.55); color: #ffb273; border-radius: 999px;
+           padding: 6px 22px; font-size: 13px; letter-spacing: 2px; margin-bottom: 30px;
+           backdrop-filter: blur(6px); animation: badgeGlow 3s ease-in-out infinite; }
+  @keyframes badgeGlow { 0%,100% { box-shadow: 0 0 8px rgba(255,140,66,.2); }
+                         50% { box-shadow: 0 0 22px rgba(255,140,66,.55); } }
 
-  /* ===== 数据统计条 ===== */
-  .stats { background: rgba(255,255,255,.04); border-top: 1px solid rgba(255,255,255,.08);
-           border-bottom: 1px solid rgba(255,255,255,.08); padding: 28px 0; }
+  /* 标题流光 */
+  .hero h1 { font-size: clamp(32px, 8vw, 62px); font-weight: 800; letter-spacing: 4px;
+             background: linear-gradient(90deg, #fff 20%, #ffb273 40%, #8fc7ee 60%, #fff 80%);
+             background-size: 200% 100%;
+             -webkit-background-clip: text; background-clip: text; color: transparent;
+             animation: shine 4s linear infinite; margin-bottom: 20px; }
+  @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  .hero .sub { font-size: clamp(14px, 3vw, 18px); color: #b9cddd; margin-bottom: 44px; }
+
+  .btn { display: inline-block; padding: 15px 42px; border-radius: 999px; font-size: 17px;
+         text-decoration: none; margin: 8px; transition: .25s; position: relative; }
+  .btn-primary { background: linear-gradient(90deg, #ff8c42, #ff5f4a); color: #fff;
+                 font-weight: bold; box-shadow: 0 0 30px rgba(255,140,66,.5);
+                 animation: btnPulse 2s ease-in-out infinite; }
+  @keyframes btnPulse { 0%,100% { box-shadow: 0 0 18px rgba(255,140,66,.4); }
+                        50% { box-shadow: 0 0 40px rgba(255,140,66,.8); } }
+  .btn-primary:hover { transform: translateY(-4px) scale(1.04); }
+  .btn-ghost { border: 1.5px solid rgba(255,255,255,.55); color: #fff; }
+  .btn-ghost:hover { background: rgba(255,255,255,.14); transform: translateY(-4px); }
+
+  /* 向下滚动提示 */
+  .scroll-hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+                 color: rgba(255,255,255,.6); font-size: 22px; z-index: 2;
+                 animation: bounce 1.6s infinite; }
+  @keyframes bounce { 0%,100% { transform: translate(-50%, 0); }
+                      50% { transform: translate(-50%, 12px); } }
+
+  /* ===== 数据条 ===== */
+  .stats { background: rgba(255,255,255,.04); border-top: 1px solid rgba(255,255,255,.1);
+           border-bottom: 1px solid rgba(255,255,255,.1); padding: 30px 0; }
   .stats .container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 16px; text-align: center; }
-  .stat b { font-size: clamp(22px, 4vw, 32px); color: #ffb273; display: block; }
+  .stat b { font-size: clamp(24px, 4.5vw, 34px); display: block;
+            background: linear-gradient(90deg, #ffb273, #ff8c42);
+            -webkit-background-clip: text; background-clip: text; color: transparent; }
   .stat span { font-size: 13px; color: #9db4c8; }
 
   /* ===== 区块 ===== */
-  section { padding: 72px 0; }
-  .sec-title { text-align: center; font-size: clamp(22px, 4vw, 30px); margin-bottom: 10px;
+  section { padding: 76px 0; }
+  .sec-title { text-align: center; font-size: clamp(24px, 4.5vw, 32px); margin-bottom: 10px;
                background: linear-gradient(90deg, #fff, #a9cbe8);
                -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .sec-sub { text-align: center; color: #7f96ac; font-size: 14px; margin-bottom: 44px; }
+  .sec-sub { text-align: center; color: #7f96ac; font-size: 14px; margin-bottom: 46px; }
 
-  /* ===== 玻璃拟态卡片 ===== */
+  /* ===== 卡片 ===== */
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
   .card { position: relative; background: rgba(255,255,255,.05); border-radius: 16px;
-          padding: 30px 22px; border: 1px solid rgba(255,255,255,.1);
+          padding: 32px 22px; border: 1px solid rgba(255,255,255,.12);
           backdrop-filter: blur(8px); transition: .3s; overflow: hidden; }
-  .card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-                  background: linear-gradient(90deg, #ff8c42, #3a7ca5); opacity: 0; transition: .3s; }
-  .card:hover { transform: translateY(-6px); border-color: rgba(255,140,66,.4);
-                box-shadow: 0 12px 32px rgba(0,0,0,.35); }
-  .card:hover::before { opacity: 1; }
-  .card .icon { font-size: 34px; margin-bottom: 14px; }
+  .card::before { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 3px;
+                  background: linear-gradient(90deg, transparent, #ff8c42, #3a7ca5, transparent);
+                  transition: .5s; }
+  .card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,140,66,.5);
+                box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 24px rgba(255,140,66,.15); }
+  .card:hover::before { left: 100%; }
+  .card .icon { font-size: 38px; margin-bottom: 14px; display: inline-block;
+                transition: .3s; }
+  .card:hover .icon { transform: scale(1.2) rotate(-8deg); }
   .card h3 { font-size: 17px; color: #fff; margin-bottom: 8px; }
   .card p { font-size: 13.5px; color: #9db4c8; }
 
   /* ===== 体验区 ===== */
-  .try-wrap { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-              border-radius: 20px; padding: 12px; box-shadow: 0 0 40px rgba(58,124,165,.25); }
+  .try-wrap { background: rgba(255,255,255,.05); border: 1px solid rgba(255,140,66,.3);
+              border-radius: 20px; padding: 12px;
+              box-shadow: 0 0 50px rgba(58,124,165,.35), 0 0 24px rgba(255,140,66,.15); }
   .chatbox { border-radius: 12px; overflow: hidden; background: #fff; }
   .chatbox iframe { width: 100%; height: 680px; border: none; display: block; }
 
@@ -85,13 +126,27 @@
 
 <!-- ① Hero -->
 <div class="hero">
-  <!-- 漂浮符号装饰 -->
-  <span class="math-float" style="top:12%; left:8%;">∫</span>
-  <span class="math-float" style="top:65%; left:14%; font-size:60px; animation-delay:2s;">√</span>
-  <span class="math-float" style="top:20%; right:10%; font-size:110px; animation-delay:1s;">π</span>
-  <span class="math-float" style="top:70%; right:14%; font-size:70px; animation-delay:3s;">Σ</span>
-  <span class="math-float" style="top:42%; left:45%; font-size:56px; animation-delay:4s;">ξ</span>
-  <span class="math-float" style="top:80%; left:55%; font-size:64px; animation-delay:2.5s;">lim</span>
+  <div class="glow glow1"></div>
+  <div class="glow glow2"></div>
+
+  <!-- 漂浮符号：16个，蓝橙两色，不同大小速度 -->
+  <span class="math-float" style="top:8%;  left:6%;  font-size:110px;">∫</span>
+  <span class="math-float orange" style="top:16%; left:22%; font-size:64px; animation-delay:1.2s;">dx</span>
+  <span class="math-float" style="top:6%;  right:8%; font-size:120px; animation-delay:.6s;">π</span>
+  <span class="math-float orange" style="top:24%; right:20%; font-size:72px; animation-delay:2s;">Σ</span>
+  <span class="math-float" style="top:40%; left:4%;  font-size:80px; animation-delay:2.8s;">√</span>
+  <span class="math-float orange" style="top:36%; right:5%; font-size:68px; animation-delay:1.6s;">lim</span>
+  <span class="math-float" style="top:58%; left:16%; font-size:92px; animation-delay:3.4s;">ξ</span>
+  <span class="math-float orange" style="top:64%; right:16%; font-size:84px; animation-delay:.9s;">∞</span>
+  <span class="math-float" style="top:78%; left:8%;  font-size:70px; animation-delay:2.2s;">Δx</span>
+  <span class="math-float orange" style="top:82%; right:10%; font-size:76px; animation-delay:3s;">eˣ</span>
+  <span class="math-float" style="top:14%; left:46%; font-size:60px; animation-delay:1.8s;">θ</span>
+  <span class="math-float orange" style="top:50%; left:38%; font-size:58px; animation-delay:2.6s;">f′(x)</span>
+  <span class="math-float" style="top:70%; left:46%; font-size:66px; animation-delay:.4s;">sin x</span>
+  <span class="math-float orange" style="top:32%; left:58%; font-size:62px; animation-delay:3.8s;">λ</span>
+  <span class="math-float" style="top:88%; left:32%; font-size:58px; animation-delay:1.4s;">∂</span>
+  <span class="math-float orange" style="top:44%; right:34%; font-size:60px; animation-delay:2.4s;">ln</span>
+
   <div class="hero-inner">
     <span class="badge">AI 赋能教·学·管 —— 学习支持类智能体</span>
     <h1>微积分错题诊疗师</h1>
@@ -99,9 +154,10 @@
     <a class="btn btn-primary" href="#try">立即体验</a>
     <a class="btn btn-ghost" href="#diff">为什么是错题本</a>
   </div>
+  <div class="scroll-hint">⌄</div>
 </div>
 
-<!-- ② 数据条（数字按你的真实情况改） -->
+<!-- ② 数据条（数字按真实情况改） -->
 <div class="stats">
   <div class="container">
     <div class="stat"><b>4 类</b><span>错因诊断体系</span></div>
