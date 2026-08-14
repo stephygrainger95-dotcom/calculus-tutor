@@ -3,240 +3,119 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>微积分错题诊疗师 — AI赋能学习</title>
+<title>微积分错题诊疗系统 — 多智能体协作</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
   body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-         background: #0a1420; color: #e8eef5; line-height: 1.7; overflow-x: hidden; }
-  .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+         background: #0a1420; color: #e8eef5; min-height: 100vh; display: flex;
+         flex-direction: column; }
 
-  /* ===== Hero ===== */
-  .hero { position: relative; min-height: 95vh; display: flex; align-items: center;
-          justify-content: center; text-align: center; overflow: hidden;
-          background: linear-gradient(-45deg, #0a1420, #16324f, #2c5f8a, #0f2237, #1e4a6e);
-          background-size: 500% 500%; animation: gradientMove 10s ease infinite; }
-  @keyframes gradientMove {
-    0% { background-position: 0% 50%; } 25% { background-position: 100% 0%; }
-    50% { background-position: 100% 100%; } 75% { background-position: 0% 100%; }
-    100% { background-position: 0% 50%; } }
+  /* 顶栏 */
+  header { display: flex; align-items: center; justify-content: space-between;
+           padding: 12px 24px; background: rgba(255,255,255,.04);
+           border-bottom: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(8px);
+           flex-wrap: wrap; gap: 10px; }
+  .logo { font-size: 19px; font-weight: 800; letter-spacing: 1px;
+          background: linear-gradient(90deg, #fff, #ffb273);
+          -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .logo small { display: block; font-size: 11px; color: #7f96ac; font-weight: 400;
+                -webkit-text-fill-color: #7f96ac; }
 
-  /* 发光光晕 */
-  .glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5;
-          animation: glowPulse 6s ease-in-out infinite; }
-  .glow1 { width: 480px; height: 480px; background: #ff8c42; top: -120px; left: -120px; }
-  .glow2 { width: 520px; height: 520px; background: #2e7fb8; bottom: -160px; right: -100px;
-           animation-delay: 3s; }
-  @keyframes glowPulse { 0%,100% { opacity: .35; transform: scale(1); }
-                         50% { opacity: .6; transform: scale(1.15); } }
+  /* Agent Tab 切换 */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tab { padding: 8px 20px; border-radius: 999px; font-size: 14px; cursor: pointer;
+         border: 1px solid rgba(255,255,255,.2); color: #b9cddd; transition: .2s;
+         background: transparent; }
+  .tab:hover { border-color: rgba(255,140,66,.6); color: #fff; }
+  .tab.active { background: linear-gradient(90deg, #ff8c42, #ff5f4a); color: #fff;
+                border-color: transparent; font-weight: bold;
+                box-shadow: 0 0 16px rgba(255,140,66,.4); }
+  .tab .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+              margin-right: 6px; background: currentColor; }
 
-  /* 漂浮数学符号：更大、更多、更明显 */
-  .math-float { position: absolute; color: rgba(160, 210, 255, .22); user-select: none;
-                text-shadow: 0 0 24px rgba(120,190,255,.5); z-index: 1;
-                animation: floaty 8s ease-in-out infinite; }
-  .math-float.orange { color: rgba(255, 170, 110, .20); text-shadow: 0 0 24px rgba(255,150,80,.5); }
-  @keyframes floaty {
-    0%   { transform: translate(0, 0) rotate(-10deg); opacity: .5; }
-    25%  { opacity: 1; }
-    50%  { transform: translate(24px, -60px) rotate(10deg); opacity: .7; }
-    75%  { opacity: 1; }
-    100% { transform: translate(0, 0) rotate(-10deg); opacity: .5; } }
+  .data-btn { padding: 8px 18px; border-radius: 999px; font-size: 13px;
+              color: #8fc7ee; border: 1px solid rgba(143,199,238,.4);
+              text-decoration: none; transition: .2s; }
+  .data-btn:hover { background: rgba(143,199,238,.12); }
 
-  .hero-inner { position: relative; z-index: 2; padding: 60px 20px; }
-  .badge { display: inline-block; background: rgba(255,140,66,.15);
-           border: 1px solid rgba(255,140,66,.55); color: #ffb273; border-radius: 999px;
-           padding: 6px 22px; font-size: 13px; letter-spacing: 2px; margin-bottom: 30px;
-           backdrop-filter: blur(6px); animation: badgeGlow 3s ease-in-out infinite; }
-  @keyframes badgeGlow { 0%,100% { box-shadow: 0 0 8px rgba(255,140,66,.2); }
-                         50% { box-shadow: 0 0 22px rgba(255,140,66,.55); } }
+  /* 当前 agent 一句话说明 */
+  .agent-tip { text-align: center; padding: 10px 16px; font-size: 13.5px;
+               color: #9db4c8; background: rgba(255,140,66,.06);
+               border-bottom: 1px solid rgba(255,255,255,.06); }
+  .agent-tip b { color: #ffb273; }
 
-  /* 标题流光 */
-  .hero h1 { font-size: clamp(32px, 8vw, 62px); font-weight: 800; letter-spacing: 4px;
-             background: linear-gradient(90deg, #fff 20%, #ffb273 40%, #8fc7ee 60%, #fff 80%);
-             background-size: 200% 100%;
-             -webkit-background-clip: text; background-clip: text; color: transparent;
-             animation: shine 4s linear infinite; margin-bottom: 20px; }
-  @keyframes shine { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  /* 聊天主体：占满剩余高度 */
+  main { flex: 1; display: flex; padding: 14px 18px 18px; }
+  .frame-wrap { flex: 1; max-width: 1000px; margin: 0 auto; width: 100%;
+                background: #fff; border-radius: 14px; overflow: hidden;
+                box-shadow: 0 0 40px rgba(58,124,165,.3); }
+  .frame-wrap iframe { width: 100%; height: 100%; border: none; display: block;
+                       background: #fff; }
 
-  .hero .sub { font-size: clamp(14px, 3vw, 18px); color: #b9cddd; margin-bottom: 44px; }
-
-  .btn { display: inline-block; padding: 15px 42px; border-radius: 999px; font-size: 17px;
-         text-decoration: none; margin: 8px; transition: .25s; position: relative; }
-  .btn-primary { background: linear-gradient(90deg, #ff8c42, #ff5f4a); color: #fff;
-                 font-weight: bold; box-shadow: 0 0 30px rgba(255,140,66,.5);
-                 animation: btnPulse 2s ease-in-out infinite; }
-  @keyframes btnPulse { 0%,100% { box-shadow: 0 0 18px rgba(255,140,66,.4); }
-                        50% { box-shadow: 0 0 40px rgba(255,140,66,.8); } }
-  .btn-primary:hover { transform: translateY(-4px) scale(1.04); }
-  .btn-ghost { border: 1.5px solid rgba(255,255,255,.55); color: #fff; }
-  .btn-ghost:hover { background: rgba(255,255,255,.14); transform: translateY(-4px); }
-
-  /* 向下滚动提示 */
-  .scroll-hint { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
-                 color: rgba(255,255,255,.6); font-size: 22px; z-index: 2;
-                 animation: bounce 1.6s infinite; }
-  @keyframes bounce { 0%,100% { transform: translate(-50%, 0); }
-                      50% { transform: translate(-50%, 12px); } }
-
-  /* ===== 数据条 ===== */
-  .stats { background: rgba(255,255,255,.04); border-top: 1px solid rgba(255,255,255,.1);
-           border-bottom: 1px solid rgba(255,255,255,.1); padding: 30px 0; }
-  .stats .container { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 16px; text-align: center; }
-  .stat b { font-size: clamp(24px, 4.5vw, 34px); display: block;
-            background: linear-gradient(90deg, #ffb273, #ff8c42);
-            -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .stat span { font-size: 13px; color: #9db4c8; }
-
-  /* ===== 区块 ===== */
-  section { padding: 76px 0; }
-  .sec-title { text-align: center; font-size: clamp(24px, 4.5vw, 32px); margin-bottom: 10px;
-               background: linear-gradient(90deg, #fff, #a9cbe8);
-               -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .sec-sub { text-align: center; color: #7f96ac; font-size: 14px; margin-bottom: 46px; }
-
-  /* ===== 卡片 ===== */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
-  .card { position: relative; background: rgba(255,255,255,.05); border-radius: 16px;
-          padding: 32px 22px; border: 1px solid rgba(255,255,255,.12);
-          backdrop-filter: blur(8px); transition: .3s; overflow: hidden; }
-  .card::before { content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 3px;
-                  background: linear-gradient(90deg, transparent, #ff8c42, #3a7ca5, transparent);
-                  transition: .5s; }
-  .card:hover { transform: translateY(-8px) scale(1.02); border-color: rgba(255,140,66,.5);
-                box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 0 24px rgba(255,140,66,.15); }
-  .card:hover::before { left: 100%; }
-  .card .icon { font-size: 38px; margin-bottom: 14px; display: inline-block;
-                transition: .3s; }
-  .card:hover .icon { transform: scale(1.2) rotate(-8deg); }
-  .card h3 { font-size: 17px; color: #fff; margin-bottom: 8px; }
-  .card p { font-size: 13.5px; color: #9db4c8; }
-
-  /* ===== 体验区 ===== */
-  .try-wrap { background: rgba(255,255,255,.05); border: 1px solid rgba(255,140,66,.3);
-              border-radius: 20px; padding: 12px;
-              box-shadow: 0 0 50px rgba(58,124,165,.35), 0 0 24px rgba(255,140,66,.15); }
-  .chatbox { border-radius: 12px; overflow: hidden; background: #fff; }
-  .chatbox iframe { width: 100%; height: 680px; border: none; display: block; }
-
-  footer { text-align: center; padding: 30px; font-size: 13px; color: #5f7488;
-           border-top: 1px solid rgba(255,255,255,.08); }
+  /* 折叠介绍 */
+  details { max-width: 1000px; margin: 0 auto 26px; width: calc(100% - 36px);
+            background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px; padding: 14px 20px; }
+  summary { cursor: pointer; color: #8fc7ee; font-size: 14px; }
+  details .inner { padding-top: 14px; font-size: 13.5px; color: #9db4c8; }
+  details .inner b { color: #ffb273; }
+  details .inner p { margin-bottom: 8px; }
 </style>
 </head>
 <body>
 
-<!-- ① Hero -->
-<div class="hero">
-  <div class="glow glow1"></div>
-  <div class="glow glow2"></div>
-
-  <!-- 漂浮符号：16个，蓝橙两色，不同大小速度 -->
-  <span class="math-float" style="top:8%;  left:6%;  font-size:110px;">∫</span>
-  <span class="math-float orange" style="top:16%; left:22%; font-size:64px; animation-delay:1.2s;">dx</span>
-  <span class="math-float" style="top:6%;  right:8%; font-size:120px; animation-delay:.6s;">π</span>
-  <span class="math-float orange" style="top:24%; right:20%; font-size:72px; animation-delay:2s;">Σ</span>
-  <span class="math-float" style="top:40%; left:4%;  font-size:80px; animation-delay:2.8s;">√</span>
-  <span class="math-float orange" style="top:36%; right:5%; font-size:68px; animation-delay:1.6s;">lim</span>
-  <span class="math-float" style="top:58%; left:16%; font-size:92px; animation-delay:3.4s;">ξ</span>
-  <span class="math-float orange" style="top:64%; right:16%; font-size:84px; animation-delay:.9s;">∞</span>
-  <span class="math-float" style="top:78%; left:8%;  font-size:70px; animation-delay:2.2s;">Δx</span>
-  <span class="math-float orange" style="top:82%; right:10%; font-size:76px; animation-delay:3s;">eˣ</span>
-  <span class="math-float" style="top:14%; left:46%; font-size:60px; animation-delay:1.8s;">θ</span>
-  <span class="math-float orange" style="top:50%; left:38%; font-size:58px; animation-delay:2.6s;">f′(x)</span>
-  <span class="math-float" style="top:70%; left:46%; font-size:66px; animation-delay:.4s;">sin x</span>
-  <span class="math-float orange" style="top:32%; left:58%; font-size:62px; animation-delay:3.8s;">λ</span>
-  <span class="math-float" style="top:88%; left:32%; font-size:58px; animation-delay:1.4s;">∂</span>
-  <span class="math-float orange" style="top:44%; right:34%; font-size:60px; animation-delay:2.4s;">ln</span>
-
-  <div class="hero-inner">
-    <span class="badge">AI 赋能教·学·管 —— 学习支持类智能体</span>
-    <h1>微积分错题诊疗师</h1>
-    <p class="sub">不只给答案，更诊断病因<br>拍照识题 · 错因归类 · 专属错题本 · 学情分析</p>
-    <a class="btn btn-primary" href="#try">立即体验</a>
-    <a class="btn btn-ghost" href="#diff">为什么是错题本</a>
+<header>
+  <div class="logo">微积分错题诊疗系统
+    <small>多智能体协作 · 诊断建档 → 攻防训练 → 学情分析</small>
   </div>
-  <div class="scroll-hint">⌄</div>
+  <div class="tabs">
+    <button class="tab active" data-src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
+      data-tip="🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。">错题诊疗师</button>
+    <button class="tab" data-src="https://udify.app/chatbot/MLPSYJvA2xRcuQxv"
+      data-tip="⚔️ <b>错题教官</b>：发送「找茬模式」批改 AI 故意埋错的解答，或发送「陷阱定制」让 AI 为你的错误习惯量身造题。">错题教官</button>
+    <!-- ★ 学情分析师建好后：把 src 换成它的地址，删掉 disabled 和这行注释 -->
+    <button class="tab" disabled data-src=""
+      data-tip="📊 <b>学情分析师</b>：读取错题本数据，生成个人薄弱点画像与复习优先级；教师视角可查看全班高频错误榜。">学情分析师(即将上线)</button>
+  </div>
+  <!-- ★ 把下面 href 换成你飞书错题本的分享链接（表格→分享→互联网上获得链接的人可阅读） -->
+  <a class="data-btn" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 查看实时错题数据</a>
+</header>
+
+<div class="agent-tip" id="tip">
+  🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。
 </div>
 
-<!-- ② 数据条（数字按真实情况改） -->
-<div class="stats">
-  <div class="container">
-    <div class="stat"><b>4 类</b><span>错因诊断体系</span></div>
-    <div class="stat"><b>30+</b><span>知识库定理卡片</span></div>
-    <div class="stat"><b>5 步</b><span>自主工作流规划</span></div>
-    <div class="stat"><b>长期</b><span>跨会话错题记忆</span></div>
+<main>
+  <div class="frame-wrap">
+    <iframe id="agentFrame" src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
+            allow="microphone;clipboard-write"></iframe>
   </div>
-</div>
+</main>
 
-<!-- ③ 核心功能 -->
-<section>
-  <div class="container">
-    <h2 class="sec-title">核心功能</h2>
-    <p class="sec-sub">围绕"诊断 — 记录 — 分析"的完整学习闭环</p>
-    <div class="cards">
-      <div class="card"><div class="icon">📷</div><h3>拍照识题</h3>
-        <p>多模态大模型识别手写作业与试卷照片，识别结果先回显确认，杜绝误识别。</p></div>
-      <div class="card"><div class="icon">🔍</div><h3>错因诊断</h3>
-        <p>不只给标准答案，将错误精准归类为概念不清、定理条件误用、计算失误、思路方向错误四类。</p></div>
-      <div class="card"><div class="icon">📒</div><h3>智能错题本</h3>
-        <p>一键确认后自动写入云端错题本，记录题目、错因、知识点与掌握状态，跨会话长期记忆。</p></div>
-      <div class="card"><div class="icon">📊</div><h3>学情分析</h3>
-        <p>基于个人错题数据生成薄弱点画像与复习优先级，针对薄弱知识点生成变式训练题。</p></div>
-    </div>
+<details>
+  <summary>关于本系统（展开查看）</summary>
+  <div class="inner">
+    <p><b>这是什么：</b>一套多智能体协作的微积分学习系统。三个智能体共享同一个错题本数据底座：诊疗师负责诊断建档，教官基于档案做攻防训练，分析师把数据转化为学情报告。</p>
+    <p><b>为什么通用大模型替代不了：</b>通用大模型对话一关就忘，只对答案负责；本系统能记住每个学生错在哪、识别"答案碰巧对但过程错误"的假掌握、并按课程教学大纲给出精确到章节的复习建议。</p>
+    <p><b>技术架构：</b>基于 Dify 工作流编排（多模态识别 → 知识库检索 → 错因诊断 → 结构化提取 → 飞书多维表格读写），私有知识库含 30+ 定理易错点卡片，经数学专业人工校验。</p>
+    <p><b>参赛作品：</b>"AI赋能教·学·管"智能体开发竞赛 · 学习支持类</p>
   </div>
-</section>
+</details>
 
-<!-- ④ 差异化优势 -->
-<section id="diff" style="background: rgba(255,255,255,.02);">
-  <div class="container">
-    <h2 class="sec-title">通用大模型能解题，为什么还需要它？</h2>
-    <p class="sec-sub">解题能力早已不是差距，真正的差距在"是否认识这个学生"</p>
-    <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-      <div class="card"><div class="icon">🧠</div><h3>通用大模型没有记忆</h3>
-        <p>对话一关就忘。它不知道你上周在泰勒展开上错过三次。本系统的错题本让每个学生拥有持续积累的学习档案。</p></div>
-      <div class="card"><div class="icon">🎯</div><h3>答案对了 ≠ 真懂</h3>
-        <p>通用大模型只对答案负责。本系统要求展示解题过程，能识别"结果碰巧正确但逻辑断裂"的假掌握。</p></div>
-      <div class="card"><div class="icon">📚</div><h3>对齐课程而非全网</h3>
-        <p>私有知识库按教学大纲和易错点建设，经数学专业人工校验，复习建议精确到具体章节定理。</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ⑤ 在线体验 -->
-<section id="try">
-  <div class="container">
-    <h2 class="sec-title">在线体验</h2>
-    <p class="sec-sub">上传错题照片开始诊断 · 诊断后发送"确认存入错题本"</p>
-    <div class="try-wrap">
-      <div class="chatbox">
-        <iframe src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
-                style="width: 100%; height: 680px" frameborder="0"
-                allow="microphone;clipboard-write"></iframe>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ⑥ 技术架构 -->
-<section style="background: rgba(255,255,255,.02);">
-  <div class="container">
-    <h2 class="sec-title">技术架构</h2>
-    <p class="sec-sub">基于 Dify 工作流编排的多步规划智能体</p>
-    <div class="cards">
-      <div class="card"><h3 style="color:#ffb273">多模态识别</h3>
-        <p>视觉大模型识别错题照片，识别结果回显确认后再进入诊断流程，保证输入可靠。</p></div>
-      <div class="card"><h3 style="color:#ffb273">RAG 私有知识库</h3>
-        <p>自建微积分定理卡片库（含使用条件与高频错误），经数学专业人工校验，诊断有据可查。</p></div>
-      <div class="card"><h3 style="color:#ffb273">工具调用</h3>
-        <p>通过飞书多维表格 API 实现错题自动写入与查询，具备跨会话长期记忆能力。</p></div>
-      <div class="card"><h3 style="color:#ffb273">多步工作流</h3>
-        <p>意图分类 → 知识检索 → 错因诊断 → 结构化提取 → 写入错题本，全流程自主衔接。</p></div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  微积分错题诊疗师 · "AI赋能教·学·管"智能体开发竞赛参赛作品 · 基于 Dify 构建
-</footer>
+<script>
+  var tabs = document.querySelectorAll('.tab');
+  var frame = document.getElementById('agentFrame');
+  var tip = document.getElementById('tip');
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () {
+      if (t.disabled || !t.dataset.src) return;
+      tabs.forEach(function (x) { x.classList.remove('active'); });
+      t.classList.add('active');
+      frame.src = t.dataset.src;
+      tip.innerHTML = t.dataset.tip;
+    });
+  });
+</script>
 
 </body>
 </html>
