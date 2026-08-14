@@ -10,6 +10,56 @@
          color: #e8eef5; min-height: 100vh; display: flex; flex-direction: column;
          position: relative; overflow-x: hidden; }
 
+  /* ===== 开场动画层 ===== */
+  #intro { position: fixed; inset: 0; z-index: 999; background: #050a12;
+           display: flex; flex-direction: column; align-items: center;
+           justify-content: center; overflow: hidden;
+           transition: opacity .8s ease, visibility .8s; }
+  #intro.done { opacity: 0; visibility: hidden; pointer-events: none; }
+
+  #intro .scan { position: absolute; inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(120,190,255,.03) 3px 4px); }
+
+  /* 启动日志 */
+  #bootlog { font-family: Consolas, monospace; font-size: 14px; color: #6fd3ff;
+             width: 320px; height: 120px; margin-bottom: 30px; text-align: left; }
+  #bootlog div { opacity: 0; animation: logIn .3s forwards; }
+  #bootlog div:nth-child(1){animation-delay:.3s} #bootlog div:nth-child(2){animation-delay:1s}
+  #bootlog div:nth-child(3){animation-delay:1.7s} #bootlog div:nth-child(4){animation-delay:2.4s}
+  #bootlog div:nth-child(5){animation-delay:3s; color:#ffb273; font-weight:bold;}
+  @keyframes logIn { from{opacity:0; transform:translateX(-14px)} to{opacity:1; transform:none} }
+
+  /* 中央 ∫ 聚能 */
+  #core { font-size: 120px; color: #8fc7ee; position: relative; z-index: 2;
+          text-shadow: 0 0 40px rgba(120,190,255,.8);
+          animation: corePulse 1.2s ease-in-out infinite; }
+  @keyframes corePulse { 0%,100%{ transform: scale(1); opacity:.85 }
+                         50%{ transform: scale(1.12); opacity:1;
+                              text-shadow: 0 0 80px rgba(255,150,80,.9), 0 0 40px rgba(120,190,255,.8);} }
+  .ring { position: absolute; top: 50%; left: 50%; border: 2px solid rgba(255,140,66,.6);
+          border-radius: 50%; transform: translate(-50%,-50%);
+          animation: ringExpand 2.2s ease-out infinite; }
+  .ring.r2 { border-color: rgba(120,190,255,.5); animation-delay: 1.1s; }
+  @keyframes ringExpand { from{ width: 120px; height: 120px; opacity: .9 }
+                          to{ width: 560px; height: 560px; opacity: 0 } }
+
+  /* 进度条 */
+  #barwrap { width: 280px; height: 4px; background: rgba(255,255,255,.12);
+             border-radius: 4px; margin-top: 40px; overflow: hidden; }
+  #bar { height: 100%; width: 0; border-radius: 4px;
+         background: linear-gradient(90deg, #ff8c42, #8fc7ee);
+         box-shadow: 0 0 12px rgba(255,140,66,.8);
+         animation: barFill 3.4s ease forwards; }
+  @keyframes barFill { to { width: 100% } }
+  #skip { position: absolute; bottom: 30px; color: #5f7488; font-size: 13px;
+          cursor: pointer; border: 1px solid rgba(255,255,255,.15);
+          padding: 6px 18px; border-radius: 999px; background: transparent; }
+  #skip:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+  /* 结束白闪 */
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  #intro.ending #flash { animation: flashOut .7s ease forwards; }
+  @keyframes flashOut { 0%{opacity:0} 40%{opacity:.9} 100%{opacity:0} }
+
   /* ===== 整页动态背景层 ===== */
   .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden;
         background: linear-gradient(-45deg, #0a1420, #16324f, #2c5f8a, #0f2237);
@@ -27,7 +77,6 @@
     0%,100% { transform: translate(0,0) scale(1); }
     33% { transform: translate(60px, -50px) scale(1.15); }
     66% { transform: translate(-50px, 40px) scale(.92); } }
-  /* 漂浮符号：铺满全屏 */
   .mf { position: absolute; color: rgba(150,205,255,.16); user-select: none;
         text-shadow: 0 0 20px rgba(120,190,255,.45);
         animation: mfFloat 12s ease-in-out infinite; }
@@ -36,7 +85,11 @@
     0%,100% { transform: translateY(0) rotate(-8deg); }
     50% { transform: translateY(-70px) rotate(10deg); } }
 
-  /* ===== 顶栏 ===== */
+  /* ===== 主界面 ===== */
+  #app { opacity: 0; transition: opacity .8s ease .1s; display: flex;
+         flex-direction: column; flex: 1; }
+  #app.show { opacity: 1; }
+
   header { display: flex; align-items: center; justify-content: space-between;
            padding: 12px 24px; background: rgba(10,20,32,.55);
            border-bottom: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(12px);
@@ -72,7 +125,6 @@
   .frame-wrap { flex: 1; max-width: 1000px; margin: 0 auto; width: 100%;
                 background: #fff; border-radius: 16px; overflow: hidden;
                 border: 1px solid rgba(255,140,66,.25);
-                box-shadow: 0 0 50px rgba(58,124,165,.35), 0 0 20px rgba(255,140,66,.12);
                 animation: frameBreathe 5s ease-in-out infinite; }
   @keyframes frameBreathe {
     0%,100% { box-shadow: 0 0 50px rgba(58,124,165,.35), 0 0 20px rgba(255,140,66,.12); }
@@ -89,6 +141,26 @@
 </style>
 </head>
 <body>
+
+<!-- 开场动画 -->
+<div id="intro">
+  <div class="scan"></div>
+  <div id="bootlog">
+    <div>&gt; 正在接入微积分知识网络 ...</div>
+    <div>&gt; 加载定理卡片库 [30+] ...</div>
+    <div>&gt; 连接错题本数据库 ...</div>
+    <div>&gt; 唤醒智能体：诊疗师 / 教官 / 分析师 ...</div>
+    <div>&gt; 系统就绪，欢迎回来。</div>
+  </div>
+  <div style="position:relative;">
+    <div id="core">∫</div>
+    <div class="ring"></div>
+    <div class="ring r2"></div>
+  </div>
+  <div id="barwrap"><div id="bar"></div></div>
+  <div id="flash"></div>
+  <button id="skip">跳过 ›</button>
+</div>
 
 <!-- 动态背景层 -->
 <div class="bg">
@@ -113,6 +185,8 @@
   <span class="mf o" style="top:72%; right:38%; font-size:50px; animation-delay:1.1s;">cos x</span>
 </div>
 
+<!-- 主界面 -->
+<div id="app">
 <header>
   <div class="logo">微积分错题诊疗系统
     <small>多智能体协作 · 诊断建档 → 攻防训练 → 学情分析</small>
@@ -148,8 +222,10 @@
     <p><b>参赛作品：</b>"AI赋能教·学·管"智能体开发竞赛 · 学习支持类</p>
   </div>
 </details>
+</div>
 
 <script>
+  // Tab 切换
   var tabs = document.querySelectorAll('.tab');
   var frame = document.getElementById('agentFrame');
   var tip = document.getElementById('tip');
@@ -162,6 +238,21 @@
       tip.innerHTML = t.dataset.tip;
     });
   });
+
+  // 开场动画：4.6秒后白闪收尾进入主界面，或点"跳过"
+  var intro = document.getElementById('intro');
+  var app = document.getElementById('app');
+  var finished = false;
+  function finishIntro() {
+    if (finished) return; finished = true;
+    intro.classList.add('ending');
+    setTimeout(function () {
+      intro.classList.add('done');
+      app.classList.add('show');
+    }, 500);
+  }
+  setTimeout(finishIntro, 4600);
+  document.getElementById('skip').addEventListener('click', finishIntro);
 </script>
 
 </body>
