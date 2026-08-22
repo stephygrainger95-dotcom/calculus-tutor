@@ -1,354 +1,2188 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>学研智脑 — 多智能体协作平台</title>
+
+<title>学研智脑 — Multi-Agent Learning OS</title>
+
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
-         color: #e8eef5; min-height: 100vh; display: flex; flex-direction: column;
-         position: relative; overflow-x: hidden; background: #050a14; }
 
-  /* ===== 开场动画层 ===== */
-  #intro { position: fixed; inset: 0; z-index: 999; background: radial-gradient(ellipse at center, #0a1626 0%, #04070d 70%);
-           display: flex; flex-direction: column; align-items: center;
-           justify-content: center; overflow: hidden;
-           transition: opacity .8s ease, visibility .8s; }
-  #intro.done { opacity: 0; visibility: hidden; pointer-events: none; }
-  #intro .scan { position: absolute; inset: 0;
-      background: repeating-linear-gradient(0deg, transparent 0 3px, rgba(120,190,255,.03) 3px 4px); }
-  #intro .grid-bg { position: absolute; inset: 0; opacity: .25;
-      background-image: linear-gradient(rgba(80,160,255,.15) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(80,160,255,.15) 1px, transparent 1px);
-      background-size: 48px 48px;
-      animation: gridMove 6s linear infinite; }
-  @keyframes gridMove { from { background-position: 0 0; } to { background-position: 0 48px; } }
+/* =========================
+   基础
+========================= */
 
-  #bootlog { font-family: Consolas, monospace; font-size: 14px; color: #6fd3ff;
-             width: 360px; height: 132px; margin-bottom: 26px; text-align: left; z-index: 2; }
-  #bootlog div { opacity: 0; animation: logIn .3s forwards; }
-  #bootlog div:nth-child(1){animation-delay:.3s} #bootlog div:nth-child(2){animation-delay:1s}
-  #bootlog div:nth-child(3){animation-delay:1.7s} #bootlog div:nth-child(4){animation-delay:2.4s}
-  #bootlog div:nth-child(5){animation-delay:3s}
-  #bootlog div:nth-child(6){animation-delay:3.5s; color:#ffb273; font-weight:bold;}
-  @keyframes logIn { from{opacity:0; transform:translateX(-14px)} to{opacity:1; transform:none} }
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-  /* 中央 AI 核心 */
-  #corewrap { position: relative; width: 200px; height: 200px;
-              display: flex; align-items: center; justify-content: center; z-index: 2; }
-  #core { width: 86px; height: 86px; border-radius: 50%;
-          background: radial-gradient(circle at 35% 35%, #bfe6ff, #3d9be0 45%, #123a5e 80%);
-          box-shadow: 0 0 50px rgba(90,180,255,.8), 0 0 120px rgba(90,180,255,.35);
-          animation: corePulse 1.2s ease-in-out infinite; }
-  @keyframes corePulse { 0%,100%{ transform: scale(1); box-shadow: 0 0 50px rgba(90,180,255,.8), 0 0 120px rgba(90,180,255,.35); }
-                         50%{ transform: scale(1.1); box-shadow: 0 0 80px rgba(255,150,80,.9), 0 0 160px rgba(90,180,255,.5); } }
-  .orbit { position: absolute; inset: 0; border-radius: 50%;
-           border: 1px solid rgba(120,190,255,.25); }
-  .orbit .sat { position: absolute; top: -4px; left: 50%; width: 8px; height: 8px;
-                border-radius: 50%; background: #8fd6ff;
-                box-shadow: 0 0 12px #8fd6ff; }
-  .orbit.o1 { animation: spin 3s linear infinite; }
-  .orbit.o2 { inset: -24px; animation: spin 5s linear infinite reverse; }
-  .orbit.o2 .sat { background: #ffb273; box-shadow: 0 0 12px #ffb273; }
-  .orbit.o3 { inset: -48px; animation: spin 8s linear infinite; }
-  .orbit.o3 .sat { background: #c79bff; box-shadow: 0 0 12px #c79bff; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .ring { position: absolute; top: 50%; left: 50%; border: 2px solid rgba(255,140,66,.5);
-          border-radius: 50%; transform: translate(-50%,-50%);
-          animation: ringExpand 2.4s ease-out infinite; }
-  .ring.r2 { border-color: rgba(120,190,255,.45); animation-delay: 1.2s; }
-  @keyframes ringExpand { from{ width: 120px; height: 120px; opacity: .9 }
-                          to{ width: 620px; height: 620px; opacity: 0 } }
+body{
 
-  #barwrap { width: 300px; height: 4px; background: rgba(255,255,255,.12);
-             border-radius: 4px; margin-top: 42px; overflow: hidden; z-index: 2; }
-  #bar { height: 100%; width: 0; border-radius: 4px;
-         background: linear-gradient(90deg, #ff8c42, #8fc7ee);
-         box-shadow: 0 0 12px rgba(255,140,66,.8);
-         animation: barFill 3.8s ease forwards; }
-  @keyframes barFill { to { width: 100% } }
-  #introTitle { margin-top: 22px; font-size: 20px; letter-spacing: 6px; color: #bfe0f5;
-                z-index: 2; opacity: 0; animation: logIn .5s forwards 3.2s; }
-  #skip { position: absolute; bottom: 30px; color: #5f7488; font-size: 13px;
-          cursor: pointer; border: 1px solid rgba(255,255,255,.15);
-          padding: 6px 18px; border-radius: 999px; background: transparent; z-index: 3; }
-  #skip:hover { color: #fff; border-color: rgba(255,255,255,.4); }
-  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
-  #intro.ending #flash { animation: flashOut .7s ease forwards; }
-  @keyframes flashOut { 0%{opacity:0} 40%{opacity:.9} 100%{opacity:0} }
+    font-family:
+    "Microsoft YaHei",
+    "PingFang SC",
+    sans-serif;
 
-  /* ===== 整页科幻背景 ===== */
-  .bg { position: fixed; inset: 0; z-index: -1; overflow: hidden;
-        background: linear-gradient(-45deg, #050b16, #0c1d33, #123a5c, #071527);
-        background-size: 400% 400%; animation: bgMove 18s ease infinite; }
-  @keyframes bgMove { 0%{background-position:0% 50%} 50%{background-position:100% 50%}
-                      100%{background-position:0% 50%} }
-  #net { position: absolute; inset: 0; }
-  .orb { position: absolute; border-radius: 50%; filter: blur(110px); opacity: .4;
-         animation: orbDrift 22s ease-in-out infinite; }
-  .orb1 { width: 520px; height: 520px; background: #2e7fb8; top: -12%; left: -8%; }
-  .orb2 { width: 560px; height: 560px; background: #ff8c42; bottom: -18%; right: -8%;
-          opacity: .3; animation-delay: 7s; }
-  .orb3 { width: 340px; height: 340px; background: #6a4dbf; top: 42%; left: 58%;
-          opacity: .25; animation-delay: 13s; }
-  @keyframes orbDrift {
-    0%,100% { transform: translate(0,0) scale(1); }
-    33% { transform: translate(70px, -50px) scale(1.12); }
-    66% { transform: translate(-50px, 45px) scale(.93); } }
+    background:#020711;
 
-  /* ===== 主界面 ===== */
-  #app { opacity: 0; transition: opacity .8s ease .1s; display: flex;
-         flex-direction: column; flex: 1; }
-  #app.show { opacity: 1; }
+    color:#e8f4ff;
 
-  header { display: flex; align-items: center; justify-content: space-between;
-           padding: 12px 24px; background: rgba(8,16,28,.6);
-           border-bottom: 1px solid rgba(120,190,255,.14); backdrop-filter: blur(14px);
-           flex-wrap: wrap; gap: 10px; }
-  .logo { font-size: 20px; font-weight: 800; letter-spacing: 2px;
-          background: linear-gradient(90deg, #fff, #8fc7ee, #ffb273);
-          background-size: 200% 100%;
-          -webkit-background-clip: text; background-clip: text; color: transparent;
-          animation: logoShine 5s linear infinite; }
-  @keyframes logoShine { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .logo small { display: block; font-size: 11px; font-weight: 400; color: #7f96ac;
-                letter-spacing: 1px; -webkit-text-fill-color: #7f96ac; }
+    min-height:100vh;
 
-  .track { display: flex; gap: 6px; background: rgba(255,255,255,.06);
-           border: 1px solid rgba(255,255,255,.14); border-radius: 999px;
-           padding: 4px; }
-  .track-btn { padding: 8px 24px; border-radius: 999px; font-size: 14.5px;
-               cursor: pointer; border: none; color: #9db4c8;
-               background: transparent; transition: .25s; font-weight: 600; }
-  .track-btn:hover { color: #fff; }
-  .track-btn.active-course { background: linear-gradient(90deg, #2e7fb8, #4db3ff);
-               color: #fff; box-shadow: 0 0 16px rgba(77,179,255,.5); }
-  .track-btn.active-comp { background: linear-gradient(90deg, #ff8c42, #ff5f4a);
-               color: #fff; box-shadow: 0 0 16px rgba(255,140,66,.55); }
+    overflow-x:hidden;
+}
 
-  .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .tab { padding: 8px 20px; border-radius: 999px; font-size: 14px; cursor: pointer;
-         border: 1px solid rgba(255,255,255,.22); color: #b9cddd; transition: .25s;
-         background: rgba(255,255,255,.05); backdrop-filter: blur(6px); }
-  .tab:hover { border-color: rgba(77,179,255,.7); color: #fff; transform: translateY(-2px); }
-  .tab.active { background: linear-gradient(90deg, #2e7fb8, #4db3ff); color: #fff;
-                border-color: transparent; font-weight: bold;
-                box-shadow: 0 0 18px rgba(77,179,255,.45); }
-  .data-btn { padding: 8px 18px; border-radius: 999px; font-size: 13px;
-              color: #8fc7ee; border: 1px solid rgba(143,199,238,.4);
-              text-decoration: none; transition: .25s; background: rgba(255,255,255,.05); }
-  .data-btn:hover { background: rgba(143,199,238,.15); box-shadow: 0 0 14px rgba(143,199,238,.3); }
 
-  .agent-tip { text-align: center; padding: 10px 16px; font-size: 13.5px;
-               color: #9db4c8; background: rgba(8,16,28,.5);
-               border-bottom: 1px solid rgba(255,255,255,.06); backdrop-filter: blur(8px); }
-  .agent-tip b { color: #ffb273; }
 
-  main { flex: 1; display: flex; padding: 14px 18px 18px; }
-  .frame-wrap { flex: 1; max-width: 1000px; margin: 0 auto; width: 100%;
-                background: #fff; border-radius: 16px; overflow: hidden;
-                border: 1px solid rgba(120,190,255,.25);
-                animation: frameBreathe 5s ease-in-out infinite; }
-  @keyframes frameBreathe {
-    0%,100% { box-shadow: 0 0 50px rgba(58,124,165,.35), 0 0 20px rgba(255,140,66,.1); }
-    50% { box-shadow: 0 0 70px rgba(58,124,165,.5), 0 0 30px rgba(255,140,66,.2); } }
-  .frame-wrap iframe { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+/* =========================
+   Multi Agent 启动界面
+========================= */
 
-  details { max-width: 1000px; margin: 0 auto 26px; width: calc(100% - 36px);
-            background: rgba(8,16,28,.6); border: 1px solid rgba(255,255,255,.1);
-            border-radius: 12px; padding: 14px 20px; backdrop-filter: blur(10px); }
-  summary { cursor: pointer; color: #8fc7ee; font-size: 14px; }
-  details .inner { padding-top: 14px; font-size: 13.5px; color: #9db4c8; }
-  details .inner b { color: #ffb273; }
-  details .inner p { margin-bottom: 8px; }
+
+#intro{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:9999;
+
+    background:
+    radial-gradient(
+        circle at center,
+        #102c46 0%,
+        #040a14 45%,
+        #010308 100%
+    );
+
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    overflow:hidden;
+
+
+    transition:
+    opacity 1s ease,
+    visibility 1s;
+
+}
+
+
+
+#intro.hide{
+
+    opacity:0;
+
+    visibility:hidden;
+
+}
+
+
+
+/* 星空粒子 */
+
+#introCanvas{
+
+    position:absolute;
+
+    inset:0;
+
+}
+
+
+
+/* HUD扫描线 */
+
+.scan-line{
+
+    position:absolute;
+
+    inset:0;
+
+
+    background:
+    repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 4px,
+        rgba(100,200,255,.035) 5px
+    );
+
+    pointer-events:none;
+
+}
+
+
+
+/* 中央区域 */
+
+.agent-core{
+
+
+    position:relative;
+
+    width:520px;
+
+    height:520px;
+
+
+}
+
+
+/* 中央核心 */
+
+.core-node{
+
+
+    position:absolute;
+
+
+    left:50%;
+
+    top:50%;
+
+
+    transform:
+    translate(-50%,-50%);
+
+
+    width:130px;
+
+    height:130px;
+
+
+    border-radius:50%;
+
+
+    background:
+
+    radial-gradient(
+        circle,
+        #ffffff 0%,
+        #8ddcff 15%,
+        #168bd1 45%,
+        #05233c 80%
+    );
+
+
+    box-shadow:
+
+
+    0 0 40px #4cc9ff,
+
+    0 0 120px rgba(70,190,255,.7);
+
+
+    animation:
+
+    corePulse 2s infinite;
+
+
+}
+
+
+
+@keyframes corePulse{
+
+
+0%,100%{
+
+transform:
+translate(-50%,-50%)
+scale(1);
+
+
+}
+
+
+50%{
+
+transform:
+translate(-50%,-50%)
+scale(1.15);
+
+
+}
+
+
+}
+
+
+
+
+/* Agent节点 */
+
+.agent{
+
+
+position:absolute;
+
+
+width:110px;
+
+height:110px;
+
+
+border-radius:50%;
+
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+
+font-size:13px;
+
+
+background:
+rgba(10,35,60,.8);
+
+
+border:
+
+1px solid rgba(120,220,255,.6);
+
+
+
+box-shadow:
+
+0 0 30px rgba(80,190,255,.5);
+
+
+
+opacity:0;
+
+
+animation:
+agentAppear .8s forwards;
+
+
+}
+
+
+
+.agent span{
+
+
+font-size:26px;
+
+margin-bottom:5px;
+
+
+}
+
+
+
+.agent small{
+
+
+font-size:11px;
+
+color:#9fdcff;
+
+
+}
+
+
+
+@keyframes agentAppear{
+
+
+from{
+
+
+opacity:0;
+
+transform:
+scale(.2);
+
+
+}
+
+
+to{
+
+
+opacity:1;
+
+transform:
+scale(1);
+
+
+}
+
+
+}
+
+
+
+
+/* 四个智能体位置 */
+
+
+.agent.a1{
+
+
+top:30px;
+
+left:205px;
+
+
+animation-delay:1s;
+
+
+}
+
+
+
+.agent.a2{
+
+
+left:20px;
+
+top:210px;
+
+
+animation-delay:1.5s;
+
+
+}
+
+
+
+.agent.a3{
+
+
+right:20px;
+
+top:210px;
+
+
+animation-delay:2s;
+
+
+}
+
+
+
+.agent.a4{
+
+
+bottom:30px;
+
+left:205px;
+
+
+animation-delay:2.5s;
+
+
+}
+
+
+
+
+
+/* 数据连接线 */
+
+
+.link{
+
+
+position:absolute;
+
+
+height:1px;
+
+
+background:
+linear-gradient(
+90deg,
+transparent,
+#53caff,
+transparent
+);
+
+
+transform-origin:left;
+
+
+opacity:.5;
+
+
+animation:
+flow 2s infinite;
+
+
+}
+
+
+
+@keyframes flow{
+
+
+from{
+
+filter:
+brightness(.5);
+
+}
+
+50%{
+
+filter:
+brightness(2);
+
+}
+
+to{
+
+filter:
+brightness(.5);
+
+}
+
+
+}
+
+
+
+
+.link1{
+
+
+width:160px;
+
+
+left:260px;
+
+top:205px;
+
+
+transform:
+rotate(-90deg);
+
+
+}
+
+
+.link2{
+
+
+width:160px;
+
+
+left:110px;
+
+top:260px;
+
+
+transform:
+rotate(0deg);
+
+
+}
+
+
+.link3{
+
+
+width:160px;
+
+
+left:260px;
+
+top:260px;
+
+
+transform:
+rotate(0deg);
+
+
+}
+
+
+.link4{
+
+
+width:160px;
+
+
+left:260px;
+
+top:330px;
+
+
+transform:
+rotate(90deg);
+
+
+}
+
+
+
+
+
+/* 标题 */
+
+.core-title{
+
+
+position:absolute;
+
+
+top:410px;
+
+
+width:100%;
+
+
+text-align:center;
+
+
+
+opacity:0;
+
+
+animation:
+titleIn 1s forwards;
+
+
+animation-delay:3.2s;
+
+
+
+}
+
+
+
+.core-title h1{
+
+
+font-size:32px;
+
+
+letter-spacing:8px;
+
+
+background:
+
+linear-gradient(
+90deg,
+#fff,
+#6fd6ff,
+#ffb36b
+);
+
+
+-webkit-background-clip:text;
+
+color:transparent;
+
+
+}
+
+
+
+.core-title p{
+
+
+margin-top:12px;
+
+
+font-size:14px;
+
+
+color:#86a8c5;
+
+
+letter-spacing:3px;
+
+
+}
+
+
+
+
+
+@keyframes titleIn{
+
+
+from{
+
+opacity:0;
+
+transform:
+translateY(20px);
+
+
+}
+
+to{
+
+opacity:1;
+
+transform:none;
+
+
+}
+
+
+}
+
+
+
+
+/* 跳过 */
+
+#skip{
+
+
+position:absolute;
+
+
+bottom:35px;
+
+
+right:40px;
+
+
+padding:
+
+8px 25px;
+
+
+border-radius:30px;
+
+
+background:
+
+rgba(255,255,255,.05);
+
+
+border:
+
+1px solid rgba(255,255,255,.2);
+
+
+color:#9ecfff;
+
+
+cursor:pointer;
+
+
+z-index:5;
+
+
+}
+
+
+
+#skip:hover{
+
+
+background:
+rgba(100,200,255,.15);
+
+
+}
+
+
+
+/* =========================
+   后续主体代码 Part2
+========================= */
+
+
 </style>
-<base target="_blank">
+
 </head>
+
+
 <body>
 
-<!-- 开场动画 -->
+
+
+<!-- =========================
+     Multi-Agent启动动画
+========================= -->
+
+
 <div id="intro">
-  <div class="grid-bg"></div>
-  <div class="scan"></div>
-  <div id="bootlog">
-    <div>&gt; 学研智脑 · 系统自检通过 ...</div>
-    <div>&gt; 多智能体协作引擎启动 ...</div>
-    <div>&gt; 载入课内诊疗模块 [诊疗师 / 教官 / 分析师] ...</div>
-    <div>&gt; 载入竞赛数据模块 [数据分析师] ...</div>
-    <div>&gt; 神经网络链路同步完成 ...</div>
-    <div>&gt; 系统就绪，欢迎回来。</div>
-  </div>
-  <div id="corewrap">
-    <div class="ring"></div>
-    <div class="ring r2"></div>
-    <div class="orbit o1"><div class="sat"></div></div>
-    <div class="orbit o2"><div class="sat"></div></div>
-    <div class="orbit o3"><div class="sat"></div></div>
-    <div id="core"></div>
-  </div>
-  <div id="introTitle">学研智脑</div>
-  <div id="barwrap"><div id="bar"></div></div>
-  <div id="flash"></div>
-  <button id="skip">跳过 ›</button>
+
+
+<canvas id="introCanvas"></canvas>
+
+
+<div class="scan-line"></div>
+
+
+
+<div class="agent-core">
+
+
+
+<div class="link link1"></div>
+<div class="link link2"></div>
+<div class="link link3"></div>
+<div class="link link4"></div>
+
+
+
+<div class="core-node"></div>
+
+
+
+
+<div class="agent a1">
+
+<span>🔍</span>
+
+错题诊疗
+
+<small>Diagnosis Agent</small>
+
 </div>
 
-<!-- 科幻背景层 -->
-<div class="bg">
-  <canvas id="net"></canvas>
-  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+
+
+<div class="agent a2">
+
+<span>⚔️</span>
+
+学习教官
+
+<small>Coach Agent</small>
+
 </div>
 
-<!-- 主界面 -->
+
+
+
+<div class="agent a3">
+
+<span>📊</span>
+
+学情分析
+
+<small>Insight Agent</small>
+
+</div>
+
+
+
+<div class="agent a4">
+
+<span>🏆</span>
+
+竞赛分析
+
+<small>Competition Agent</small>
+
+</div>
+
+
+
+
+<div class="core-title">
+
+<h1>
+学研智脑
+</h1>
+
+<p>
+MULTI-AGENT LEARNING OS
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+
+<button id="skip">
+SKIP →
+</button>
+
+
+
+</div>
+<style>
+
+/* =========================
+   主系统背景
+========================= */
+
+
+.system-bg{
+
+position:fixed;
+
+inset:0;
+
+z-index:-2;
+
+
+background:
+
+linear-gradient(
+135deg,
+#020711,
+#092038,
+#06111e
+);
+
+
+overflow:hidden;
+
+
+}
+
+
+
+.system-bg::before{
+
+
+content:"";
+
+position:absolute;
+
+inset:0;
+
+
+background-image:
+
+linear-gradient(
+rgba(80,180,255,.08) 1px,
+transparent 1px
+),
+
+linear-gradient(
+90deg,
+rgba(80,180,255,.08) 1px,
+transparent 1px
+);
+
+
+background-size:
+
+60px 60px;
+
+
+animation:
+
+gridMove 12s linear infinite;
+
+
+opacity:.3;
+
+
+}
+
+
+
+@keyframes gridMove{
+
+
+from{
+
+transform:
+translateY(0);
+
+}
+
+to{
+
+transform:
+translateY(60px);
+
+}
+
+
+}
+
+
+
+
+
+/* =========================
+   APP主体
+========================= */
+
+
+#app{
+
+
+opacity:0;
+
+
+transition:
+
+opacity 1s;
+
+
+min-height:100vh;
+
+
+display:flex;
+
+flex-direction:column;
+
+
+}
+
+
+
+#app.show{
+
+opacity:1;
+
+}
+
+
+
+
+
+/* =========================
+   顶部控制台
+========================= */
+
+
+header{
+
+
+height:76px;
+
+
+display:flex;
+
+
+align-items:center;
+
+
+justify-content:space-between;
+
+
+padding:
+
+0 30px;
+
+
+
+background:
+
+rgba(5,15,28,.75);
+
+
+
+border-bottom:
+
+1px solid rgba(100,200,255,.15);
+
+
+
+backdrop-filter:
+
+blur(20px);
+
+
+}
+
+
+
+
+
+.logo{
+
+
+font-size:24px;
+
+
+font-weight:900;
+
+
+letter-spacing:3px;
+
+
+background:
+
+linear-gradient(
+90deg,
+#fff,
+#55cfff,
+#ffb36b
+);
+
+
+-webkit-background-clip:text;
+
+
+color:transparent;
+
+
+}
+
+
+
+.logo small{
+
+
+display:block;
+
+
+font-size:12px;
+
+
+font-weight:400;
+
+
+letter-spacing:1px;
+
+
+margin-top:5px;
+
+
+color:#7e9ab5;
+
+
+}
+
+
+
+
+
+/* 双赛道 */
+
+
+.track{
+
+
+display:flex;
+
+
+gap:10px;
+
+
+background:
+
+rgba(255,255,255,.05);
+
+
+padding:5px;
+
+
+border-radius:30px;
+
+
+}
+
+
+
+
+.track-btn{
+
+
+padding:
+
+10px 26px;
+
+
+border-radius:30px;
+
+
+border:none;
+
+
+cursor:pointer;
+
+
+color:#9bb6cc;
+
+
+background:transparent;
+
+
+font-size:15px;
+
+
+font-weight:bold;
+
+
+transition:.3s;
+
+
+}
+
+
+
+.track-btn.active-course{
+
+
+background:
+
+linear-gradient(
+90deg,
+#168bd1,
+#53d0ff
+);
+
+
+color:white;
+
+
+box-shadow:
+
+0 0 25px rgba(50,200,255,.6);
+
+
+}
+
+
+
+
+.track-btn.active-comp{
+
+
+background:
+
+linear-gradient(
+90deg,
+#ff8c42,
+#ff4d4d
+);
+
+
+color:white;
+
+
+box-shadow:
+
+0 0 25px rgba(255,120,70,.6);
+
+
+}
+
+
+
+
+
+/* Agent按钮 */
+
+
+.tabs{
+
+
+display:flex;
+
+
+gap:8px;
+
+
+}
+
+
+
+.tab{
+
+
+padding:
+
+8px 18px;
+
+
+border-radius:20px;
+
+
+border:
+
+1px solid rgba(120,200,255,.25);
+
+
+
+background:
+
+rgba(255,255,255,.04);
+
+
+
+color:#b6d2e8;
+
+
+cursor:pointer;
+
+
+transition:.3s;
+
+
+}
+
+
+
+.tab.active{
+
+
+background:
+
+linear-gradient(
+90deg,
+#168bd1,
+#4ecbff
+);
+
+
+color:white;
+
+
+}
+
+
+
+
+
+.data-btn{
+
+
+padding:
+
+9px 18px;
+
+
+border-radius:20px;
+
+
+border:
+
+1px solid rgba(255,180,100,.4);
+
+
+color:#ffbd88;
+
+
+text-decoration:none;
+
+
+}
+
+
+
+
+
+/* =========================
+   提示区域
+========================= */
+
+
+.agent-tip{
+
+
+text-align:center;
+
+
+padding:
+
+12px;
+
+
+background:
+
+rgba(0,0,0,.35);
+
+
+color:#9bb6cc;
+
+
+font-size:14px;
+
+
+border-bottom:
+
+1px solid rgba(255,255,255,.08);
+
+
+}
+
+
+.agent-tip b{
+
+color:#ffb36b;
+
+}
+
+
+
+
+
+/* =========================
+   iframe区域
+========================= */
+
+
+main{
+
+
+flex:1;
+
+
+padding:
+
+20px;
+
+
+display:flex;
+
+
+}
+
+
+
+.frame-wrap{
+
+
+width:100%;
+
+
+max-width:1200px;
+
+
+margin:auto;
+
+
+height:
+
+calc(100vh - 190px);
+
+
+
+background:white;
+
+
+border-radius:20px;
+
+
+overflow:hidden;
+
+
+
+box-shadow:
+
+0 0 60px rgba(50,180,255,.25);
+
+
+
+}
+
+
+
+iframe{
+
+
+width:100%;
+
+
+height:100%;
+
+
+border:none;
+
+
+}
+
+
+
+
+
+
+
+/* =========================
+   关于系统
+========================= */
+
+
+details{
+
+
+margin:
+
+0 auto 20px;
+
+
+width:
+
+calc(100% - 40px);
+
+
+max-width:1200px;
+
+
+
+background:
+
+rgba(5,15,30,.8);
+
+
+
+border:
+
+1px solid rgba(120,200,255,.15);
+
+
+padding:
+
+15px 20px;
+
+
+border-radius:15px;
+
+
+color:#aac4da;
+
+
+}
+
+
+
+summary{
+
+
+cursor:pointer;
+
+
+color:#6fd6ff;
+
+
+}
+
+
+
+.inner{
+
+
+padding-top:15px;
+
+
+font-size:14px;
+
+
+line-height:1.8;
+
+
+}
+
+
+</style>
+
+
+
+
+
+<!-- =========================
+     主系统
+========================= -->
+
+
+<div class="system-bg"></div>
+
+
+
 <div id="app">
+
+
+
 <header>
-  <div class="logo">学研智脑
-    <small>多智能体协作 · 课内微积分 × 课外竞赛</small>
-  </div>
-  <div class="track">
-    <button class="track-btn active-course" id="btnCourse">📖 课内微积分</button>
-    <button class="track-btn" id="btnComp">🏆 课外竞赛</button>
-  </div>
-  <div class="tabs" id="courseTabs">
-    <button class="tab active" data-src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
-      data-tip="🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。">错题诊疗师</button>
-    <button class="tab" data-src="https://udify.app/chatbot/MLPSYJvA2xRcuQxv"
-      data-tip="⚔️ <b>错题教官</b>：发送「找茬模式」批改 AI 故意埋错的解答，或发送「陷阱定制」让 AI 为你的错误习惯量身造题。">错题教官</button>
-    <button class="tab" data-src="https://udify.app/chatbot/qVngF5df6eA6DKuP"
-      data-tip="📊 <b>学情分析师</b>：读取错题本数据，生成个人薄弱点画像与复习优先级；教师视角可查看全班高频错误榜。">学情分析师</button>
-  </div>
-  <a class="data-btn" id="dataBtn" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 查看实时错题数据</a>
+
+
+
+<div class="logo">
+
+
+学研智脑
+
+
+<small>
+多智能体协作学习平台 · Multi-Agent Education OS
+</small>
+
+
+</div>
+
+
+
+
+<div class="track">
+
+
+<button 
+class="track-btn active-course"
+id="btnCourse">
+
+📖 课内微积分
+
+</button>
+
+
+
+<button 
+class="track-btn"
+id="btnComp">
+
+🏆 课外竞赛
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<div class="tabs" id="courseTabs">
+
+
+<button 
+class="tab active"
+data-src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
+data-tip="🔍 错题诊疗师：识别错误类型，分析知识漏洞，并自动建立个人错题画像">
+
+错题诊疗师
+
+</button>
+
+
+
+<button 
+class="tab"
+data-src="https://udify.app/chatbot/MLPSYJvA2xRcuQxv"
+data-tip="⚔️ 错题教官：通过找茬训练和陷阱题生成强化薄弱能力">
+
+错题教官
+
+</button>
+
+
+
+<button 
+class="tab"
+data-src="https://udify.app/chatbot/qVngF5df6eA6DKuP"
+data-tip="📊 学情分析师：基于错题数据生成学习画像">
+
+学情分析师
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<a 
+class="data-btn"
+id="dataBtn"
+href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh">
+
+📒 实时错题数据
+
+</a>
+
+
+
 </header>
 
+
+
+
+
 <div class="agent-tip" id="tip">
-  🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。
+
+🔍 错题诊疗师：识别错误类型，分析知识漏洞，并自动建立个人错题画像
+
+
 </div>
+
+
+
+
+
 
 <main>
-  <div class="frame-wrap">
-    <iframe id="agentFrame" src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
-            allow="microphone;clipboard-write"></iframe>
-  </div>
-</main>
 
-<details>
-  <summary>关于本平台（展开查看）</summary>
-  <div class="inner">
-    <p><b>这是什么：</b>一套多智能体协作的学习支持平台，覆盖两大平级场景——课内微积分：诊疗师诊断建档、教官攻防训练、分析师生成学情报告，三个智能体共享同一个错题本数据底座；课外竞赛：数据分析师接收 Excel 数据表，由代码精确计算统计量，AI 生成分析报告与可视化图表。</p>
-    <p><b>为什么通用大模型替代不了：</b>通用大模型对话一关就忘，只对答案负责；本系统能记住每个学生错在哪、识别"答案碰巧对但过程错误"的假掌握；数据分析场景中所有数字由代码计算而非模型估算，保证零错误。</p>
-    <p><b>技术架构：</b>基于 Dify 工作流编排——课内线：多模态识别 → 知识库检索 → 错因诊断 → 结构化提取 → 飞书多维表格读写；竞赛线：文档提取 → 代码执行统计计算 → LLM 报告生成 → ECharts 自动绘图。私有知识库含 30+ 定理易错点卡片，经数学专业人工校验。</p>
-    <p><b>参赛作品：</b>"AI赋能教·学·管"智能体开发竞赛 · 学习支持类</p>
-  </div>
-</details>
+
+<div class="frame-wrap">
+
+
+<iframe
+
+id="agentFrame"
+
+src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
+
+allow="microphone;clipboard-write">
+
+</iframe>
+
+
+
 </div>
 
+
+</main>
+
+
+
+
+
+<details>
+
+
+<summary>
+
+关于学研智脑
+
+</summary>
+
+
+
+<div class="inner">
+
+
+<p>
+
+<b>核心理念：</b>
+
+不是单一AI问答，而是多个专业Agent围绕学习数据持续协同。
+
+</p>
+
+
+<p>
+
+<b>课内闭环：</b>
+
+错题诊疗 → 错因识别 → 教官训练 → 学情分析 → 个性化学习。
+
+</p>
+
+
+
+<p>
+
+<b>竞赛模式：</b>
+
+数据分析Agent负责数据计算，AI负责解释与可视化生成。
+
+</p>
+
+
+
+<p>
+
+<b>技术架构：</b>
+
+Dify Agent工作流 + 知识库 + 飞书数据底座 + Python计算分析。
+
+</p>
+
+
+</div>
+
+
+</details>
+
+
+
+</div>
 <script>
-  // Tab 切换
-  var tabs = document.querySelectorAll('.tab');
-  var frame = document.getElementById('agentFrame');
-  var tip = document.getElementById('tip');
-  tabs.forEach(function (t) {
-    t.addEventListener('click', function () {
-      if (t.disabled || !t.dataset.src) return;
-      tabs.forEach(function (x) { x.classList.remove('active'); });
-      t.classList.add('active');
-      frame.src = t.dataset.src;
-      tip.innerHTML = t.dataset.tip;
-    });
-  });
 
-  // 赛道切换：课内微积分 / 课外竞赛
-  var btnCourse = document.getElementById('btnCourse');
-  var btnComp = document.getElementById('btnComp');
-  var courseTabs = document.getElementById('courseTabs');
-  var dataBtn = document.getElementById('dataBtn');
-  var COMP_SRC = 'https://udify.app/chatbot/xD2yYF586oTgpGYc';
-  var COMP_TIP = '🏆 <b>竞赛数据分析师</b>：上传 Excel/CSV 数据表，代码精确计算统计量，AI 自动生成分析报告与可视化图表——代码负责算，AI 负责讲，数字零错误。';
 
-  btnCourse.addEventListener('click', function () {
-    btnCourse.className = 'track-btn active-course';
-    btnComp.className = 'track-btn';
-    courseTabs.style.display = 'flex';
-    dataBtn.style.display = '';
-    var cur = courseTabs.querySelector('.tab.active') || courseTabs.querySelector('.tab');
-    tabs.forEach(function (x) { x.classList.remove('active'); });
-    cur.classList.add('active');
-    frame.src = cur.dataset.src;
-    tip.innerHTML = cur.dataset.tip;
-  });
+/* =========================
+   Agent切换系统
+========================= */
 
-  btnComp.addEventListener('click', function () {
-    btnComp.className = 'track-btn active-comp';
-    btnCourse.className = 'track-btn';
-    courseTabs.style.display = 'none';
-    dataBtn.style.display = 'none';
-    frame.src = COMP_SRC;
-    tip.innerHTML = COMP_TIP;
-  });
 
-  // 粒子神经网络背景
-  var canvas = document.getElementById('net');
-  var ctx = canvas.getContext('2d');
-  var nodes = [];
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-  var N = Math.min(70, Math.floor(window.innerWidth / 22));
-  for (var i = 0; i < N; i++) {
-    nodes.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - .5) * .45,
-      vy: (Math.random() - .5) * .45,
-      r: Math.random() * 1.6 + .8
-    });
-  }
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (var i = 0; i < nodes.length; i++) {
-      var a = nodes[i];
-      a.x += a.vx; a.y += a.vy;
-      if (a.x < 0 || a.x > canvas.width) a.vx *= -1;
-      if (a.y < 0 || a.y > canvas.height) a.vy *= -1;
-      ctx.beginPath();
-      ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(140,200,255,.5)';
-      ctx.fill();
-      for (var j = i + 1; j < nodes.length; j++) {
-        var b = nodes[j];
-        var dx = a.x - b.x, dy = a.y - b.y;
-        var d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 150) {
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
-          ctx.strokeStyle = 'rgba(120,190,255,' + (0.14 * (1 - d / 150)) + ')';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(draw);
-  }
-  draw();
+const tabs =
+document.querySelectorAll(".tab");
 
-  // 开场动画：5秒后白闪收尾进入主界面，或点"跳过"
-  var intro = document.getElementById('intro');
-  var app = document.getElementById('app');
-  var finished = false;
-  function finishIntro() {
-    if (finished) return; finished = true;
-    intro.classList.add('ending');
-    setTimeout(function () {
-      intro.classList.add('done');
-      app.classList.add('show');
-    }, 500);
-  }
-  setTimeout(finishIntro, 5000);
-  document.getElementById('skip').addEventListener('click', finishIntro);
+
+const frame =
+document.getElementById("agentFrame");
+
+
+const tip =
+document.getElementById("tip");
+
+
+
+tabs.forEach(tab=>{
+
+
+tab.onclick=function(){
+
+
+tabs.forEach(t=>
+
+t.classList.remove("active")
+
+);
+
+
+tab.classList.add("active");
+
+
+
+frame.src =
+tab.dataset.src;
+
+
+
+tip.innerHTML =
+tab.dataset.tip;
+
+
+};
+
+
+});
+
+
+
+
+
+
+
+/* =========================
+   赛道切换
+========================= */
+
+
+const btnCourse =
+document.getElementById("btnCourse");
+
+
+const btnComp =
+document.getElementById("btnComp");
+
+
+const courseTabs =
+document.getElementById("courseTabs");
+
+
+const dataBtn =
+document.getElementById("dataBtn");
+
+
+
+const COMP_SRC =
+
+"https://udify.app/chatbot/xD2yYF586oTgpGYc";
+
+
+
+const COMP_TIP =
+
+"🏆 竞赛数据分析师：上传Excel/CSV数据，由代码完成统计计算，AI生成分析报告和可视化结果。";
+
+
+
+
+
+btnCourse.onclick=function(){
+
+
+btnCourse.className =
+"track-btn active-course";
+
+
+btnComp.className =
+"track-btn";
+
+
+courseTabs.style.display="flex";
+
+
+dataBtn.style.display="block";
+
+
+
+let current =
+document.querySelector(".tab.active");
+
+
+if(!current)
+
+current=tabs[0];
+
+
+
+frame.src =
+current.dataset.src;
+
+
+
+tip.innerHTML =
+current.dataset.tip;
+
+
+
+};
+
+
+
+
+
+btnComp.onclick=function(){
+
+
+btnComp.className =
+"track-btn active-comp";
+
+
+btnCourse.className =
+"track-btn";
+
+
+
+courseTabs.style.display="none";
+
+
+dataBtn.style.display="none";
+
+
+
+frame.src =
+COMP_SRC;
+
+
+tip.innerHTML =
+COMP_TIP;
+
+
+
+};
+
+
+
+
+
+
+
+
+/* =========================
+   启动动画控制
+========================= */
+
+
+const intro =
+document.getElementById("intro");
+
+
+const app =
+document.getElementById("app");
+
+
+
+let started=false;
+
+
+
+function enterSystem(){
+
+
+if(started)
+
+return;
+
+
+
+started=true;
+
+
+
+intro.classList.add("hide");
+
+
+
+setTimeout(()=>{
+
+
+app.classList.add("show");
+
+
+},800);
+
+
+
+}
+
+
+
+
+
+setTimeout(
+
+enterSystem,
+
+5200
+
+);
+
+
+
+document
+.getElementById("skip")
+.onclick=
+
+enterSystem;
+
+
+
+
+
+
+
+/* =========================
+   开场神经粒子网络
+========================= */
+
+
+const canvas =
+document.getElementById("introCanvas");
+
+
+const ctx =
+canvas.getContext("2d");
+
+
+
+let particles=[];
+
+
+
+function resizeCanvas(){
+
+
+canvas.width =
+window.innerWidth;
+
+
+canvas.height =
+window.innerHeight;
+
+
+
+}
+
+
+
+resizeCanvas();
+
+
+window.addEventListener(
+"resize",
+resizeCanvas
+);
+
+
+
+
+
+
+for(let i=0;i<120;i++){
+
+
+particles.push({
+
+
+x:
+Math.random()*innerWidth,
+
+
+y:
+Math.random()*innerHeight,
+
+
+vx:
+(Math.random()-.5)*0.4,
+
+
+vy:
+(Math.random()-.5)*0.4,
+
+
+size:
+Math.random()*2+1
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+function drawNetwork(){
+
+
+ctx.clearRect(
+0,
+0,
+canvas.width,
+canvas.height
+);
+
+
+
+
+particles.forEach(p=>{
+
+
+p.x+=p.vx;
+
+p.y+=p.vy;
+
+
+
+if(
+p.x<0 ||
+p.x>canvas.width
+)
+
+p.vx*=-1;
+
+
+
+if(
+p.y<0 ||
+p.y>canvas.height
+)
+
+p.vy*=-1;
+
+
+
+ctx.beginPath();
+
+
+ctx.arc(
+p.x,
+p.y,
+p.size,
+0,
+Math.PI*2
+);
+
+
+
+ctx.fillStyle=
+"rgba(90,210,255,.7)";
+
+
+ctx.fill();
+
+
+
+
+particles.forEach(q=>{
+
+
+let dx =
+p.x-q.x;
+
+
+let dy =
+p.y-q.y;
+
+
+let dist =
+Math.sqrt(
+dx*dx+dy*dy
+);
+
+
+
+if(dist<130){
+
+
+ctx.beginPath();
+
+
+ctx.moveTo(
+p.x,
+p.y
+);
+
+
+ctx.lineTo(
+q.x,
+q.y
+);
+
+
+
+ctx.strokeStyle=
+
+"rgba(80,190,255,"+
+
+(0.15-dist/900)
+
++")";
+
+
+
+ctx.stroke();
+
+
+
+}
+
+
+
+});
+
+
+
+});
+
+
+
+requestAnimationFrame(drawNetwork);
+
+
+}
+
+
+
+drawNetwork();
+
+
+
+
+
 </script>
 
+
 </body>
+
 </html>
