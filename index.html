@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>学研智脑 | Multi-Agent Learning OS</title>
+<title>联知拓扑 | LinkTop OS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:#e8f2fb;overflow-x:hidden;}
@@ -12,31 +12,32 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 #intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 42% 40%,#101c40 0%,#070f26 55%,#04081a 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity .8s ease,transform .8s ease;overflow:hidden;cursor:pointer;}
 #intro.hide{opacity:0;transform:translateY(-30px);pointer-events:none;}
 #space{position:absolute;inset:0;}
-.boot-text{position:absolute;bottom:12vh;width:100%;text-align:center;font-family:Consolas,monospace;color:#9db4f0;font-size:14px;letter-spacing:3px;z-index:2;transition:opacity .3s;}
-.boot-text b{color:#55ff9b;font-weight:600;}
-.sys-title{position:relative;text-align:center;z-index:3;opacity:0;pointer-events:none;}
-.sys-title.reveal{animation:titleIn 1s cubic-bezier(.2,.7,.3,1) forwards;}
-@keyframes titleIn{
-  0%{opacity:0;filter:blur(22px);letter-spacing:38px;transform:scale(1.06);}
-  100%{opacity:1;filter:blur(0);letter-spacing:16px;transform:scale(1);}
+.boot-text{display:none;}
+.sys-title{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;z-index:3;pointer-events:none;}
+.sys-title h1{font-size:clamp(38px,6.4vw,62px);font-weight:900;letter-spacing:14px;}
+.sys-title .ch{display:inline-block;opacity:0;background:linear-gradient(120deg,#eaf2ff,#8fb4ff 45%,#c9a4ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 44px rgba(130,150,255,.5);}
+.sys-title.reveal .ch{animation:chIn 1.05s cubic-bezier(.16,1.2,.3,1) forwards;}
+@keyframes chIn{
+  0%{opacity:0;filter:blur(16px);transform:translateY(30px) scale(1.14);}
+  55%{opacity:1;filter:blur(3px);transform:translateY(-5px) scale(1.02);}
+  100%{opacity:1;filter:blur(0);transform:translateY(0) scale(1);}
 }
-.sys-title h1{font-size:clamp(34px,6vw,58px);font-weight:900;background:linear-gradient(90deg,#fff,#62d8ff,#b58cff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 46px rgba(80,200,255,.55);}
-.sys-title p{margin-top:12px;font-size:13px;letter-spacing:7px;color:#8db6d8;opacity:0;}
-.sys-title.reveal p{animation:subIn .8s .45s ease forwards;}
-@keyframes subIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.sys-title p{margin-top:16px;font-size:14px;letter-spacing:10px;color:#a8b6e8;opacity:0;}
+.sys-title.reveal p{animation:subIn 1s .9s ease forwards;}
+@keyframes subIn{from{opacity:0;transform:translateY(10px);filter:blur(6px);}to{opacity:1;transform:translateY(0);filter:blur(0);}}
 #skip{position:absolute;right:36px;bottom:30px;padding:9px 26px;border-radius:30px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.28);color:white;cursor:pointer;z-index:5;font-size:13px;}
 #skip:hover{background:rgba(255,255,255,.15);}
 
 /* =========== 公共 =========== */
-.system-bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(135deg,#050d20,#0b1c38 50%,#0a1430);}
+.system-bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(135deg,#0a1730,#14284e 50%,#101f42);}
 /* 蓝紫极光背景（全局：首页+对话页共享） */
 .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;}
 .aurora i{position:absolute;border-radius:50%;filter:blur(70px);}
-.aurora .a1{width:60vw;height:60vw;left:-14vw;top:-20vw;background:radial-gradient(circle,rgba(56,120,255,.5),transparent 68%);animation:auMove1 26s ease-in-out infinite alternate;}
-.aurora .a2{width:55vw;height:55vw;right:-16vw;top:4vh;background:radial-gradient(circle,rgba(139,92,246,.46),transparent 68%);animation:auMove2 32s ease-in-out infinite alternate;}
-.aurora .a3{width:46vw;height:46vw;left:22vw;bottom:-24vw;background:radial-gradient(circle,rgba(76,110,245,.4),transparent 68%);animation:auMove1 38s ease-in-out infinite alternate-reverse;}
+.aurora .a1{width:60vw;height:60vw;left:-14vw;top:-20vw;background:radial-gradient(circle,rgba(70,135,255,.62),transparent 68%);animation:auMove1 26s ease-in-out infinite alternate;}
+.aurora .a2{width:55vw;height:55vw;right:-16vw;top:4vh;background:radial-gradient(circle,rgba(150,105,255,.58),transparent 68%);animation:auMove2 32s ease-in-out infinite alternate;}
+.aurora .a3{width:46vw;height:46vw;left:22vw;bottom:-24vw;background:radial-gradient(circle,rgba(255,110,190,.34),transparent 68%);animation:auMove1 38s ease-in-out infinite alternate-reverse;}
 /* 极光光带：斜向缓慢流动 */
-.aurora .beam{width:130vw;height:34vh;left:-15vw;top:26vh;border-radius:0;filter:blur(60px);opacity:.16;
+.aurora .beam{width:130vw;height:34vh;left:-15vw;top:26vh;border-radius:0;filter:blur(60px);opacity:.24;
   background:linear-gradient(100deg,transparent 8%,#3f7dff 32%,#9d6bff 55%,#4fc3ff 78%,transparent 94%);
   animation:beamSway 24s ease-in-out infinite alternate;}
 @keyframes beamSway{from{transform:rotate(-9deg) translateY(-4vh);}to{transform:rotate(-4deg) translateY(6vh);}}
@@ -85,9 +86,9 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 .agent-tip b{color:#ffb273;}
 
 .agent-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
-.card{padding:26px 18px;border-radius:16px;background:rgba(8,25,45,.8);border:1px solid rgba(255,255,255,.1);text-align:center;transition:transform .25s,box-shadow .25s,border-color .25s;opacity:0;transform:translateY(18px);animation:cardIn .6s ease forwards;}
-.card:nth-child(1){animation-delay:.05s;}.card:nth-child(2){animation-delay:.18s;}
-.card:nth-child(3){animation-delay:.31s;}.card:nth-child(4){animation-delay:.44s;}
+.card{padding:26px 18px;border-radius:16px;background:rgba(14,32,58,.82);border:1px solid rgba(255,255,255,.12);text-align:center;transition:transform .25s,box-shadow .25s,border-color .25s;opacity:0;transform:translateY(34px);animation:cardIn 1.5s cubic-bezier(.2,.8,.3,1) forwards;}
+.card:nth-child(1){animation-delay:.2s;}.card:nth-child(2){animation-delay:.75s;}
+.card:nth-child(3){animation-delay:1.3s;}.card:nth-child(4){animation-delay:1.85s;}
 @keyframes cardIn{to{opacity:1;transform:translateY(0);}}
 .card:hover{transform:translateY(-4px);border-color:rgba(85,207,255,.45);box-shadow:0 8px 30px rgba(58,124,165,.25);}
 .card .orb{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 28px currentColor;transition:.25s;}
@@ -119,8 +120,30 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 .about .inner b{color:#ffb273;}
 .about .inner p{margin-bottom:7px;}
 
-/* =========== 对话视图 =========== */
-#chatView{display:none;flex:1;flex-direction:column;padding:16px 18px 20px;}
+/* =========== 对话视图（浅色纯净风） =========== */
+#chatView{display:none;flex:1;flex-direction:column;padding:16px 18px 20px;
+  background:
+    radial-gradient(55vw 42vh at 12% 0%, rgba(120,150,255,.14), transparent 70%),
+    radial-gradient(50vw 42vh at 92% 100%, rgba(190,140,255,.13), transparent 70%),
+    linear-gradient(160deg,#f4f7fd,#e9eefa);
+  color:#22314f;}
+#chatView .chat-agent-name{color:#22314f;}
+#chatView .back-btn{background:#fff;border-color:#ccd9f0;color:#41538a;}
+#chatView .back-btn:hover{background:#eef3ff;}
+#chatView .mini-tab{background:rgba(255,255,255,.8);color:#5a6d99;border-color:#d5e0f5;}
+#chatView .mini-tab:hover{color:#22314f;border-color:#8faeff;}
+#chatView .mini-tab.on{background:#e2ebff;color:#2b4bb3;border-color:#8faeff;}
+#chatView .cs-card{background:rgba(255,255,255,.88);border-color:#dfe7f8;box-shadow:0 4px 18px rgba(90,120,190,.08);}
+#chatView .cs-id h3{color:#22314f;}
+#chatView .cs-id .en{color:#7e8fb5;}
+#chatView .cs-desc{color:#5c6f96;}
+#chatView .cs-card h4{color:#4a63b8;}
+#chatView .cs-try{background:#f2f6ff;border-color:#dbe5fa;color:#4c5f8d;}
+#chatView .cs-pos{color:#4c5f8d;}
+#chatView .cs-pos .step-on{color:#c2571a;}
+#chatView .cs-pos .step-on:before{color:#e07b2d;}
+#chatView .cs-pos .step-off:before{color:#b9c6e2;}
+#chatView .ai-window{box-shadow:0 12px 42px rgba(80,110,180,.2);}
 .chat-body{display:flex;flex:1;gap:16px;min-height:70vh;}
 .chat-side{width:270px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;}
 .cs-card{background:rgba(5,20,38,.75);border:1px solid rgba(100,200,255,.16);border-radius:15px;padding:18px;}
@@ -170,10 +193,9 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 <div id="intro">
   <canvas id="space"></canvas>
   <div class="sys-title" id="sysTitle">
-    <h1>学研智脑</h1>
-    <p>MULTI-AGENT LEARNING OS · 多智能体协同 · 赋能教与学</p>
+    <h1>联知拓扑</h1>
+    <p>LINKTOP OS</p>
   </div>
-  <div class="boot-text" id="bootText">SYSTEM INITIALIZING · 系统初始化中</div>
   <button id="skip">跳过动画 ≫</button>
 </div>
 
@@ -186,7 +208,7 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
   <header class="topbar">
     <div class="brand">
       <div class="logo-core">◇</div>
-      <div><h2>学研智脑</h2><p>MULTI-AGENT LEARNING OS</p></div>
+      <div><h2>联知拓扑</h2><p>LINKTOP OS · MULTI-AGENT</p></div>
     </div>
     <div class="top-right">
       <a class="data-link" id="dataBtn" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 实时错题数据</a>
@@ -376,145 +398,81 @@ if(sessionStorage.getItem("introDone")){
 
 function runIntro(){
   var t0 = performance.now();
-  var bootText = document.getElementById("bootText");
   var sysTitle = document.getElementById("sysTitle");
-  // 背景星点（蓝紫色调，缓慢漂移）
+  // 标题拆成单字，逐个浮现
+  var h1 = sysTitle.querySelector("h1");
+  var chars = h1.textContent.split("");
+  h1.innerHTML = chars.map(function(c, i){
+    return '<span class="ch" style="animation-delay:' + (i * 0.14) + 's">' + c + '</span>';
+  }).join("");
+  // 稀疏星点
   var stars = [];
-  for(var i=0;i<110;i++){
-    stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.5+0.4,
-                s:Math.random()*0.00005+0.000015,
-                c:Math.random()<0.5 ? "140,175,255" : "195,160,255"});
+  for(var i=0;i<70;i++){
+    stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.4+0.3,
+                tw:Math.random()*Math.PI*2,
+                c:Math.random()<0.5 ? "150,180,255" : "205,170,255"});
   }
-  // 蓝紫星云（呼吸感）
-  var NEBULA = [
-    {dx:-0.16, dy:-0.10, r:0.42, c:"70,110,235", ph:0},
-    {dx: 0.18, dy: 0.12, r:0.46, c:"140,95,235", ph:2.1},
-    {dx: 0.00, dy: 0.30, r:0.36, c:"60,140,220", ph:4.2}
+  // 极光波带：三层叠加（玫红→紫→蓝）
+  var BANDS = [
+    {y:0.5,  a1:60, a2:26, f1:0.0035, f2:0.009,  s1:0.55, s2:0.32, w:110, alpha:.10},
+    {y:0.5,  a1:52, a2:22, f1:0.0042, f2:0.0076, s1:0.42, s2:0.5,  w:46,  alpha:.22},
+    {y:0.5,  a1:48, a2:19, f1:0.003,  f2:0.0105, s1:0.6,  s2:0.28, w:10,  alpha:.85}
   ];
-  // 4 个智能体节点（角度/颜色/名称/出现时刻）
-  var NODES = [
-    {a:-Math.PI*0.78, c:"#42cfff", label:"错题诊疗师",   at:0.95},
-    {a:-Math.PI*0.28, c:"#b58cff", label:"学情分析师",   at:1.15},
-    {a: Math.PI*0.28, c:"#ff9a52", label:"错题教官",     at:1.35},
-    {a: Math.PI*0.78, c:"#62ff9d", label:"竞赛数据分析师", at:1.55}
-  ];
-  var phase2done = false, titleShown = false;
-
-  function ease(p){ return 1 - Math.pow(1 - Math.min(Math.max(p,0),1), 3); }
+  var titleShown = false;
 
   function frame(now){
     var t = (now - t0) / 1000;
     var W = canvas.width, H = canvas.height;
-    var cx = W/2, cy = H*0.44;
-    var R = Math.min(W,H) * 0.26;
     ctx.clearRect(0,0,W,H);
 
-    // 星云底色
-    NEBULA.forEach(function(nb){
-      var br = nb.r * (1 + Math.sin(t*0.5 + nb.ph)*0.06);
-      var g = ctx.createRadialGradient(cx + nb.dx*W, cy + nb.dy*H, 0,
-                                       cx + nb.dx*W, cy + nb.dy*H, br*Math.min(W,H));
-      g.addColorStop(0, "rgba(" + nb.c + ",.14)");
-      g.addColorStop(1, "rgba(" + nb.c + ",0)");
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,W,H);
-    });
-    // 星点背景
+    // 星点闪烁
     stars.forEach(function(s){
-      s.y += s.s * H; if(s.y > 1) s.y = 0;
+      s.tw += 0.015;
+      var a = 0.2 + Math.sin(s.tw)*0.18;
       ctx.beginPath();
       ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
-      ctx.fillStyle = "rgba(" + s.c + ",.55)";
+      ctx.fillStyle = "rgba(" + s.c + "," + Math.max(a,0.05) + ")";
       ctx.fill();
     });
 
-    // 收束阶段：2.0s 起所有元素向中心收拢并淡出
-    var conv = ease((t - 2.0) / 0.55);
-    var alpha = 1 - ease((t - 2.25) / 0.4);
-    if(alpha <= 0 && titleShown){ requestAnimationFrame(frame); return; }
-    ctx.globalAlpha = Math.max(alpha, 0);
-
-    // 阶段一：0–0.95s 旋转细环
-    if(t < 2.0 || conv < 1){
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(t * 0.9);
-      var rg = ctx.createLinearGradient(-34, -34, 34, 34);
-      rg.addColorStop(0, "rgba(96,145,255,.7)");
-      rg.addColorStop(1, "rgba(170,120,255,.7)");
-      ctx.strokeStyle = rg;
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([46, 26]);
+    // 极光波带（振幅随时间渐入）
+    var grow = Math.min(t / 1.4, 1);
+    var fade = 1 - Math.max(0, (t - 3.6) / 0.5) * 0.35; // 标题出现后波带略退
+    BANDS.forEach(function(b){
       ctx.beginPath();
-      ctx.arc(0, 0, 34, 0, Math.PI*2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
-      // 中心核（柔缓呼吸）
-      var pulse = 3 + Math.sin(t*2.6)*1.1;
-      ctx.beginPath();
-      ctx.arc(cx, cy, pulse, 0, Math.PI*2);
-      ctx.fillStyle = "#a9baff";
-      ctx.shadowColor = "#8b9dff"; ctx.shadowBlur = 20;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-
-    // 阶段二：节点亮起 + 连线生长
-    var nodePos = [];
-    NODES.forEach(function(n){
-      var pop = ease((t - n.at) / 0.3);
-      var nx = cx + Math.cos(n.a) * R, ny = cy + Math.sin(n.a) * R;
-      // 收拢：向中心移动
-      nx += (cx - nx) * conv; ny += (cy - ny) * conv;
-      nodePos.push({x:nx, y:ny, pop:pop, c:n.c, label:n.label});
-      if(pop <= 0) return;
-      // 中心→节点连线（随 pop 生长）
-      ctx.strokeStyle = n.c; ctx.globalAlpha = Math.max(alpha,0) * pop * 0.7;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(cx + (nx-cx)*pop, cy + (ny-cy)*pop);
-      ctx.stroke();
-      // 节点光点
-      ctx.globalAlpha = Math.max(alpha,0) * pop;
-      ctx.beginPath();
-      ctx.arc(nx, ny, 7*pop, 0, Math.PI*2);
-      ctx.fillStyle = n.c;
-      ctx.shadowColor = n.c; ctx.shadowBlur = 22;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      // 名称
-      ctx.font = "12px 'Microsoft YaHei',sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillStyle = "rgba(220,240,255,.9)";
-      ctx.fillText(n.label, nx, ny + 24);
-    });
-    // 相邻节点互联（组网感）
-    if(t > 1.7 && nodePos[3].pop > 0){
-      ctx.globalAlpha = Math.max(alpha,0) * ease((t-1.7)/0.3) * 0.4;
-      ctx.strokeStyle = "#8fa3e8"; ctx.lineWidth = 1;
-      for(var i=0;i<4;i++){
-        var a = nodePos[i], b = nodePos[(i+1)%4];
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      for(var x=0; x<=W; x+=6){
+        var env = Math.sin(Math.PI * x / W); // 两端收拢
+        var y = H*b.y
+          + Math.sin(x*b.f1 + t*b.s1) * b.a1 * env * grow
+          + Math.sin(x*b.f2 - t*b.s2 + 1.7) * b.a2 * env * grow;
+        if(x===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
-    }
+      var g = ctx.createLinearGradient(0,0,W,0);
+      g.addColorStop(0,   "rgba(255,79,163,0)");
+      g.addColorStop(0.18,"rgba(255,79,163,.9)");
+      g.addColorStop(0.42,"rgba(176,107,255,1)");
+      g.addColorStop(0.62,"rgba(150,110,255,.95)");
+      g.addColorStop(0.85,"rgba(79,125,255,.85)");
+      g.addColorStop(1,   "rgba(79,125,255,0)");
+      ctx.strokeStyle = g;
+      ctx.lineWidth = b.w;
+      ctx.lineCap = "round";
+      ctx.globalAlpha = b.alpha * fade;
+      ctx.shadowColor = "rgba(170,110,255,.8)";
+      ctx.shadowBlur = b.w > 20 ? 60 : 24;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    });
     ctx.globalAlpha = 1;
 
-    // 文案与标题调度
-    if(t > 1.7 && !phase2done){
-      phase2done = true;
-      bootText.innerHTML = "4 AGENTS LINKED · <b>4 个智能体已连接</b>";
-    }
-    if(t > 2.35 && !titleShown){
+    if(t > 1.5 && !titleShown){
       titleShown = true;
       sysTitle.classList.add("reveal");
-      bootText.style.opacity = "0";
     }
     if(!entered) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
-  setTimeout(enterSystem, 4300);
+  setTimeout(enterSystem, 4600);
 }
 
 /* ===== AGENT 数据 ===== */
