@@ -9,62 +9,34 @@
 body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:#e8f2fb;overflow-x:hidden;}
 
 /* =========== INTRO =========== */
-#intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 50% 60%,#0d2542 0%,#030712 65%);display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity 1s ease;overflow:hidden;}
-#intro.hide{opacity:0;pointer-events:none;}
+#intro{position:fixed;inset:0;z-index:9999;background:#040b18;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity .8s ease,transform .8s ease;overflow:hidden;cursor:pointer;}
+#intro.hide{opacity:0;transform:translateY(-30px);pointer-events:none;}
 #space{position:absolute;inset:0;}
-.hud{position:absolute;inset:26px;border:1px solid rgba(80,200,255,.13);pointer-events:none;}
-.hud:before{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#42d9ff,transparent);animation:scan 4s linear infinite;}
-@keyframes scan{from{transform:translateY(0);}to{transform:translateY(100vh);}}
-.sys-title{text-align:center;z-index:2;margin-bottom:8px;}
-.sys-title h1{font-size:clamp(32px,6vw,56px);letter-spacing:16px;font-weight:900;background:linear-gradient(90deg,#fff,#62d8ff,#b58cff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 40px rgba(80,200,255,.6);}
-.sys-title p{margin-top:10px;font-size:14px;letter-spacing:7px;color:#8db6d8;}
-.core-stage{position:relative;width:min(980px,96vw);height:min(470px,58vh);z-index:2;}
-.core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:170px;height:170px;}
-.hex{position:absolute;inset:0;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:linear-gradient(135deg,#48d8ff,#154d88);box-shadow:0 0 90px #2dcaff;animation:rotateCore 9s linear infinite;}
-.hex-inner{position:absolute;inset:14px;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:#06192d;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:rotateBack 9s linear infinite;}
-.hex-inner b{font-size:20px;letter-spacing:3px;color:#7fe8ff;}
-.hex-inner span{font-size:11px;color:#8aa9c5;margin-top:8px;}
-@keyframes rotateCore{to{transform:rotate(360deg);}}
-@keyframes rotateBack{to{transform:rotate(-360deg);}}
-.core-halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;height:280px;border-radius:50%;border:1px dashed rgba(80,200,255,.3);animation:rotateCore 20s linear infinite;}
-.core-halo.h2{width:400px;height:400px;border-color:rgba(181,140,255,.18);animation-duration:32s;animation-direction:reverse;}
-.node{position:absolute;width:190px;text-align:center;animation:nodeFloat 5s ease-in-out infinite;}
-@keyframes nodeFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
-.node .orb{width:74px;height:74px;margin:0 auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 35px currentColor;}
-.node h3{font-size:17px;margin-bottom:3px;}
-.node small{font-size:11px;color:#7fa8c9;letter-spacing:1px;}
-.node .desc{font-size:11px;color:#5f7d99;margin-top:4px;}
-.n1{left:2%;top:6%;color:#42cfff;}
-.n2{right:2%;top:6%;color:#b58cff;animation-delay:1.2s;}
-.n3{left:8%;bottom:4%;color:#ff9a52;animation-delay:2.4s;}
-.n4{right:8%;bottom:4%;color:#62ff9d;animation-delay:3.6s;}
-.n1 .orb{background:radial-gradient(circle at 32% 30%,#bdeaff,#178bd1 60%,#08233c);}
-.n2 .orb{background:radial-gradient(circle at 32% 30%,#e6d4ff,#7b4de0 60%,#1d0f3c);}
-.n3 .orb{background:radial-gradient(circle at 32% 30%,#ffd9b8,#e0662a 60%,#3c1c08);}
-.n4 .orb{background:radial-gradient(circle at 32% 30%,#c8ffdd,#22a85c 60%,#08301a);}
-.wire{position:absolute;height:1px;background:linear-gradient(90deg,transparent,#46d8ff,transparent);opacity:.45;animation:flow 2s infinite;}
-@keyframes flow{50%{opacity:1;}}
-.w1{width:24%;left:22%;top:26%;transform:rotate(8deg);}
-.w2{width:24%;right:22%;top:26%;transform:rotate(-8deg);}
-.w3{width:24%;left:24%;bottom:24%;transform:rotate(-8deg);}
-.w4{width:24%;right:24%;bottom:24%;transform:rotate(8deg);}
-.boot-line{position:absolute;bottom:74px;width:100%;text-align:center;font-family:Consolas,monospace;color:#82cfff;font-size:13.5px;z-index:2;}
-.progress{width:340px;max-width:70vw;height:5px;margin:12px auto;background:#12263d;overflow:hidden;border-radius:3px;}
-.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#36d8ff,#b58cff);animation:load 4.2s forwards;box-shadow:0 0 10px #36d8ff;}
-@keyframes load{to{width:100%;}}
+.boot-text{position:absolute;bottom:12vh;width:100%;text-align:center;font-family:Consolas,monospace;color:#82cfff;font-size:14px;letter-spacing:3px;z-index:2;transition:opacity .3s;}
+.boot-text b{color:#55ff9b;font-weight:600;}
+.sys-title{position:relative;text-align:center;z-index:3;opacity:0;pointer-events:none;}
+.sys-title.reveal{animation:titleIn 1s cubic-bezier(.2,.7,.3,1) forwards;}
+@keyframes titleIn{
+  0%{opacity:0;filter:blur(22px);letter-spacing:38px;transform:scale(1.06);}
+  100%{opacity:1;filter:blur(0);letter-spacing:16px;transform:scale(1);}
+}
+.sys-title h1{font-size:clamp(34px,6vw,58px);font-weight:900;background:linear-gradient(90deg,#fff,#62d8ff,#b58cff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 46px rgba(80,200,255,.55);}
+.sys-title p{margin-top:12px;font-size:13px;letter-spacing:7px;color:#8db6d8;opacity:0;}
+.sys-title.reveal p{animation:subIn .8s .45s ease forwards;}
+@keyframes subIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 #skip{position:absolute;right:36px;bottom:30px;padding:9px 26px;border-radius:30px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.28);color:white;cursor:pointer;z-index:5;font-size:13px;}
 #skip:hover{background:rgba(255,255,255,.15);}
-@media (max-width:900px){
-  .node{width:120px;}
-  .node .orb{width:52px;height:52px;font-size:22px;}
-  .node h3{font-size:13px;}
-  .node .desc{display:none;}
-  .wire{display:none;}
-  .core{width:120px;height:120px;}
-}
 
 /* =========== 公共 =========== */
-.system-bg{position:fixed;inset:0;z-index:-2;background:linear-gradient(135deg,#020611,#081a2d 55%,#04101f);}
+.system-bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(135deg,#020611,#081a2d 55%,#04101f);}
+/* 柔和极光背景 */
+.aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;}
+.aurora .a1{width:55vw;height:55vw;left:-12vw;top:-18vw;background:radial-gradient(circle,#1b5f9e,transparent 70%);animation:auMove1 26s ease-in-out infinite alternate;}
+.aurora .a2{width:48vw;height:48vw;right:-14vw;top:8vh;background:radial-gradient(circle,#4a3a8e,transparent 70%);animation:auMove2 32s ease-in-out infinite alternate;}
+.aurora .a3{width:40vw;height:40vw;left:24vw;bottom:-22vw;background:radial-gradient(circle,#0f4d5e,transparent 70%);animation:auMove1 38s ease-in-out infinite alternate-reverse;}
+@keyframes auMove1{from{transform:translate(0,0) scale(1);}to{transform:translate(6vw,4vh) scale(1.12);}}
+@keyframes auMove2{from{transform:translate(0,0) scale(1);}to{transform:translate(-5vw,6vh) scale(1.08);}}
 #app{display:flex;flex-direction:column;min-height:100vh;opacity:0;transition:1s;}
 #app.show{opacity:1;}
 
@@ -80,10 +52,14 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 .system-state i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#55ff9b;box-shadow:0 0 10px #55ff9b;margin-right:6px;animation:blink 1.6s infinite;}
 @keyframes blink{50%{opacity:.35;}}
 
-.track{display:flex;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:4px;}
-.track-btn{padding:9px 28px;border-radius:999px;border:none;background:transparent;color:#9db4c8;cursor:pointer;font-size:14.5px;font-weight:600;transition:.25s;}
-.track-btn.active-course{background:linear-gradient(90deg,#178bd1,#43d6ff);color:#fff;box-shadow:0 0 16px rgba(67,214,255,.5);}
-.track-btn.active-comp{background:linear-gradient(90deg,#ff8c42,#ff5f4a);color:#fff;box-shadow:0 0 16px rgba(255,140,66,.55);}
+/* 关键数字（CountUp） */
+.stats{display:flex;gap:14px;flex-wrap:wrap;}
+.stat{flex:1;min-width:150px;background:rgba(5,20,38,.66);border:1px solid rgba(100,200,255,.14);border-radius:12px;padding:12px 16px;display:flex;align-items:baseline;gap:8px;}
+.stat b{font-size:26px;font-family:Consolas;background:linear-gradient(90deg,#62d8ff,#b58cff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.stat span{font-size:12px;color:#7fa8c9;}
+/* 点击微光点 */
+.spark{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:9998;animation:sparkFly .6s ease-out forwards;}
+@keyframes sparkFly{from{opacity:1;transform:translate(0,0) scale(1);}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.2);}}
 
 /* =========== 首页视图 =========== */
 #homeView{display:flex;flex:1;padding:18px;gap:18px;}
@@ -102,8 +78,11 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 .agent-tip b{color:#ffb273;}
 
 .agent-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
-.card{padding:26px 18px;border-radius:16px;background:rgba(8,25,45,.8);border:1px solid rgba(255,255,255,.1);text-align:center;transition:.25s;}
-.card.dim{opacity:.26;filter:grayscale(.7);}
+.card{padding:26px 18px;border-radius:16px;background:rgba(8,25,45,.8);border:1px solid rgba(255,255,255,.1);text-align:center;transition:transform .25s,box-shadow .25s,border-color .25s;opacity:0;transform:translateY(18px);animation:cardIn .6s ease forwards;}
+.card:nth-child(1){animation-delay:.05s;}.card:nth-child(2){animation-delay:.18s;}
+.card:nth-child(3){animation-delay:.31s;}.card:nth-child(4){animation-delay:.44s;}
+@keyframes cardIn{to{opacity:1;transform:translateY(0);}}
+.card:hover{transform:translateY(-4px);border-color:rgba(85,207,255,.45);box-shadow:0 8px 30px rgba(58,124,165,.25);}
 .card .orb{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 28px currentColor;transition:.25s;}
 .card:hover .orb{transform:scale(1.08);}
 .card h3{margin-top:4px;font-size:17px;}
@@ -176,45 +155,30 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
   .side-foot{display:none;}
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
 <!-- =========== INTRO =========== -->
 <div id="intro">
   <canvas id="space"></canvas>
-  <div class="hud"></div>
-  <div class="sys-title">
+  <div class="sys-title" id="sysTitle">
     <h1>学研智脑</h1>
     <p>MULTI-AGENT LEARNING OS · 多智能体协同 · 赋能教与学</p>
   </div>
-  <div class="core-stage">
-    <div class="wire w1"></div><div class="wire w2"></div>
-    <div class="wire w3"></div><div class="wire w4"></div>
-    <div class="core-halo"></div><div class="core-halo h2"></div>
-    <div class="node n1"><div class="orb">🔍</div><h3>错题诊疗师</h3><small>Diagnosis Agent</small><div class="desc">识别错因 / 精准诊断 / 建档归类</div></div>
-    <div class="node n2"><div class="orb">📊</div><h3>学情分析师</h3><small>Insight Agent</small><div class="desc">学情画像 / 薄弱点分析 / 策略建议</div></div>
-    <div class="node n3"><div class="orb">⚔️</div><h3>错题教官</h3><small>Coach Agent</small><div class="desc">找茬训练 / 陷阱造题 / 能力强化</div></div>
-    <div class="node n4"><div class="orb">🏆</div><h3>竞赛数据分析师</h3><small>Competition Agent</small><div class="desc">数据计算 / 统计分析 / 可视化报告</div></div>
-    <div class="core"><div class="hex"><div class="hex-inner"><b>核心引擎</b><span>4 AGENTS LINKED</span></div></div></div>
-  </div>
-  <div class="boot-line">SYSTEM INITIALIZING · 多智能体协作引擎启动中
-    <div class="progress"><span></span></div>
-  </div>
+  <div class="boot-text" id="bootText">SYSTEM INITIALIZING · 系统初始化中</div>
   <button id="skip">跳过动画 ≫</button>
 </div>
 
 <!-- =========== MAIN =========== -->
 <div class="system-bg"></div>
+<div class="aurora"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
 
 <div id="app">
   <header class="topbar">
     <div class="brand">
       <div class="logo-core">◇</div>
       <div><h2>学研智脑</h2><p>MULTI-AGENT LEARNING OS</p></div>
-    </div>
-    <div class="track">
-      <button id="btnCourse" class="track-btn active-course">📖 课内微积分</button>
-      <button id="btnComp" class="track-btn">🏆 课外竞赛</button>
     </div>
     <div class="top-right">
       <a class="data-link" id="dataBtn" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 实时错题数据</a>
@@ -240,7 +204,14 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
     <section class="main-panel">
       <div class="agent-header">
         <h2>当前智能体网络</h2>
-        <span id="agentCount">3 Course Agents Connected</span>
+        <span id="agentCount">4 Agents Connected</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><b class="count" data-to="4">0</b><span>协作智能体</span></div>
+        <div class="stat"><b class="count" data-to="30" data-suffix="+">0</b><span>定理易错点知识卡片</span></div>
+        <div class="stat"><b class="count" data-to="4">0</b><span>类错因诊断体系</span></div>
+        <div class="stat"><b class="count" data-to="2">0</b><span>条真实数据流水线</span></div>
       </div>
 
       <div class="agent-tip" id="tip">🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。点击卡片进入对话。</div>
@@ -264,7 +235,7 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
           <div class="desc">基于错题本数据，生成个人/班级学情画像与复习优先级</div>
           <button class="enter-agent" data-agent="2">进入对话 →</button>
         </div>
-        <div class="card c-green dim" data-track="comp">
+        <div class="card c-green" data-track="comp">
           <div class="orb">🏆</div>
           <h3>竞赛数据分析师</h3><div class="en">Competition Agent</div>
           <div class="desc">上传 Excel/CSV，代码精确计算统计量，AI 生成分析报告与图表</div>
@@ -272,14 +243,24 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
         </div>
       </div>
 
-      <div class="pipeline" id="pipeline">
-        <div class="pl-title" id="plTitle">课内数据流 · REAL PIPELINE</div>
-        <div class="pl-steps" id="plSteps">
+      <div class="pipeline">
+        <div class="pl-title">课内数据流 · REAL PIPELINE</div>
+        <div class="pl-steps">
           <span class="pl-step">📷 拍照上传错题</span><span class="pl-arrow">→</span>
           <span class="pl-step">🔍 AI 错因诊断</span><span class="pl-arrow">→</span>
           <span class="pl-step">📒 写入飞书错题本</span><span class="pl-arrow">→</span>
           <span class="pl-step">⚔️ 攻防训练</span><span class="pl-arrow">→</span>
           <span class="pl-step">📊 学情报告</span>
+        </div>
+      </div>
+      <div class="pipeline comp">
+        <div class="pl-title">竞赛数据流 · REAL PIPELINE</div>
+        <div class="pl-steps">
+          <span class="pl-step">📁 上传 Excel/CSV</span><span class="pl-arrow">→</span>
+          <span class="pl-step">📄 文档提取</span><span class="pl-arrow">→</span>
+          <span class="pl-step">🐍 代码精确计算</span><span class="pl-arrow">→</span>
+          <span class="pl-step">🤖 AI 分析报告</span><span class="pl-arrow">→</span>
+          <span class="pl-step">📈 自动生成图表</span>
         </div>
       </div>
 
@@ -330,43 +311,155 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 </div>
 
 <script>
-/* ===== INTRO ===== */
+/* ===== INTRO：系统启动 → 智能体组网 → 标题显现 ===== */
 var intro = document.getElementById("intro");
 var app = document.getElementById("app");
 var entered = false;
 function enterSystem(){
   if(entered) return;
   entered = true;
+  try{ sessionStorage.setItem("introDone", "1"); }catch(e){}
   intro.classList.add("hide");
-  setTimeout(function(){ app.classList.add("show"); }, 300);
+  setTimeout(function(){ app.classList.add("show"); runCount(); }, 250);
 }
-setTimeout(enterSystem, 5200);
-document.getElementById("skip").onclick = enterSystem;
 
-/* ===== 星空 ===== */
 var canvas = document.getElementById("space");
 var ctx = canvas.getContext("2d");
-var stars = [];
 function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resize();
 window.addEventListener("resize", resize);
-for(var i=0;i<160;i++){
-  stars.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
-              r:Math.random()*2+0.5, speed:Math.random()*0.5+0.1});
+
+if(sessionStorage.getItem("introDone")){
+  intro.style.display = "none";
+  app.classList.add("show"); runCount();
+  entered = true;
+} else {
+  document.getElementById("skip").onclick = function(e){ e.stopPropagation(); enterSystem(); };
+  intro.onclick = enterSystem;
+  runIntro();
 }
-function animateStars(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  stars.forEach(function(s){
-    s.y += s.speed;
-    if(s.y > canvas.height) s.y = 0;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-    ctx.fillStyle = "rgba(100,210,255,.8)";
-    ctx.fill();
-  });
-  requestAnimationFrame(animateStars);
+
+function runIntro(){
+  var t0 = performance.now();
+  var bootText = document.getElementById("bootText");
+  var sysTitle = document.getElementById("sysTitle");
+  // 背景星点
+  var stars = [];
+  for(var i=0;i<110;i++){
+    stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.6+0.4, s:Math.random()*0.00006+0.00002});
+  }
+  // 4 个智能体节点（角度/颜色/名称/出现时刻）
+  var NODES = [
+    {a:-Math.PI*0.78, c:"#42cfff", label:"错题诊疗师",   at:0.95},
+    {a:-Math.PI*0.28, c:"#b58cff", label:"学情分析师",   at:1.15},
+    {a: Math.PI*0.28, c:"#ff9a52", label:"错题教官",     at:1.35},
+    {a: Math.PI*0.78, c:"#62ff9d", label:"竞赛数据分析师", at:1.55}
+  ];
+  var phase2done = false, titleShown = false;
+
+  function ease(p){ return 1 - Math.pow(1 - Math.min(Math.max(p,0),1), 3); }
+
+  function frame(now){
+    var t = (now - t0) / 1000;
+    var W = canvas.width, H = canvas.height;
+    var cx = W/2, cy = H*0.44;
+    var R = Math.min(W,H) * 0.26;
+    ctx.clearRect(0,0,W,H);
+
+    // 星点背景
+    stars.forEach(function(s){
+      s.y += s.s * H; if(s.y > 1) s.y = 0;
+      ctx.beginPath();
+      ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(100,210,255,.5)";
+      ctx.fill();
+    });
+
+    // 收束阶段：2.0s 起所有元素向中心收拢并淡出
+    var conv = ease((t - 2.0) / 0.55);
+    var alpha = 1 - ease((t - 2.25) / 0.4);
+    if(alpha <= 0 && titleShown){ requestAnimationFrame(frame); return; }
+    ctx.globalAlpha = Math.max(alpha, 0);
+
+    // 阶段一：0–0.95s 旋转细环
+    if(t < 2.0 || conv < 1){
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(t * 1.6);
+      ctx.strokeStyle = "rgba(80,200,255,.55)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([46, 26]);
+      ctx.beginPath();
+      ctx.arc(0, 0, 34, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      // 中心核
+      var pulse = 3 + Math.sin(t*5)*1.2;
+      ctx.beginPath();
+      ctx.arc(cx, cy, pulse, 0, Math.PI*2);
+      ctx.fillStyle = "#7fe8ff";
+      ctx.shadowColor = "#42d9ff"; ctx.shadowBlur = 18;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // 阶段二：节点亮起 + 连线生长
+    var nodePos = [];
+    NODES.forEach(function(n){
+      var pop = ease((t - n.at) / 0.3);
+      var nx = cx + Math.cos(n.a) * R, ny = cy + Math.sin(n.a) * R;
+      // 收拢：向中心移动
+      nx += (cx - nx) * conv; ny += (cy - ny) * conv;
+      nodePos.push({x:nx, y:ny, pop:pop, c:n.c, label:n.label});
+      if(pop <= 0) return;
+      // 中心→节点连线（随 pop 生长）
+      ctx.strokeStyle = n.c; ctx.globalAlpha = Math.max(alpha,0) * pop * 0.7;
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + (nx-cx)*pop, cy + (ny-cy)*pop);
+      ctx.stroke();
+      // 节点光点
+      ctx.globalAlpha = Math.max(alpha,0) * pop;
+      ctx.beginPath();
+      ctx.arc(nx, ny, 7*pop, 0, Math.PI*2);
+      ctx.fillStyle = n.c;
+      ctx.shadowColor = n.c; ctx.shadowBlur = 22;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      // 名称
+      ctx.font = "12px 'Microsoft YaHei',sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(220,240,255,.9)";
+      ctx.fillText(n.label, nx, ny + 24);
+    });
+    // 相邻节点互联（组网感）
+    if(t > 1.7 && nodePos[3].pop > 0){
+      ctx.globalAlpha = Math.max(alpha,0) * ease((t-1.7)/0.3) * 0.4;
+      ctx.strokeStyle = "#7fb8dd"; ctx.lineWidth = 1;
+      for(var i=0;i<4;i++){
+        var a = nodePos[i], b = nodePos[(i+1)%4];
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    // 文案与标题调度
+    if(t > 1.7 && !phase2done){
+      phase2done = true;
+      bootText.innerHTML = "4 AGENTS LINKED · <b>4 个智能体已连接</b>";
+    }
+    if(t > 2.35 && !titleShown){
+      titleShown = true;
+      sysTitle.classList.add("reveal");
+      bootText.style.opacity = "0";
+    }
+    if(!entered) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  setTimeout(enterSystem, 4300);
 }
-animateStars();
 
 /* ===== AGENT 数据 ===== */
 var agents = [
@@ -404,26 +497,10 @@ var iframe = document.getElementById("agentFrame");
 var tip = document.getElementById("tip");
 var winTitle = document.getElementById("winTitle");
 var chatName = document.getElementById("chatName");
-var cards = document.querySelectorAll(".card");
-var pipeline = document.getElementById("pipeline");
-var plTitle = document.getElementById("plTitle");
-var plSteps = document.getElementById("plSteps");
 var homeView = document.getElementById("homeView");
 var chatView = document.getElementById("chatView");
 var miniTabs = document.getElementById("miniTabs");
-var currentTrack = "course";
 var currentAgent = 0;
-
-var COURSE_STEPS = '<span class="pl-step">📷 拍照上传错题</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">🔍 AI 错因诊断</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">📒 写入飞书错题本</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">⚔️ 攻防训练</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">📊 学情报告</span>';
-var COMP_STEPS = '<span class="pl-step">📁 上传 Excel/CSV</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">📄 文档提取</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">🐍 代码精确计算</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">🤖 AI 分析报告</span><span class="pl-arrow">→</span>'
-  + '<span class="pl-step">📈 自动生成图表</span>';
 
 /* ===== 进入对话视图 ===== */
 function openChat(id){
@@ -446,8 +523,8 @@ function openChat(id){
   document.getElementById("csPos").innerHTML = a.pos.map(function(s, i){
     return '<div class="' + (i === a.posIdx ? "step-on" : "step-off") + '">' + s + '</div>';
   }).join("");
-  // 构建 mini tabs（当前赛道的 agent）
-  var ids = (currentTrack === "course") ? [0,1,2] : [3];
+  // 构建 mini tabs（全部 4 个 agent）
+  var ids = [0,1,2,3];
   miniTabs.innerHTML = "";
   ids.forEach(function(i){
     var b = document.createElement("button");
@@ -470,45 +547,47 @@ document.getElementById("backBtn").onclick = function(){
 
 document.querySelectorAll(".enter-agent").forEach(function(btn){
   btn.onclick = function(){
-    var id = parseInt(this.dataset.agent);
-    if(id === 3 && currentTrack !== "comp") switchTrack("comp", true);
-    if(id !== 3 && currentTrack !== "course") switchTrack("course", true);
-    openChat(id);
+    openChat(parseInt(this.dataset.agent));
   };
 });
 
-/* ===== 赛道切换 ===== */
-var btnCourse = document.getElementById("btnCourse");
-var btnComp = document.getElementById("btnComp");
-var agentCount = document.getElementById("agentCount");
-var dataBtn = document.getElementById("dataBtn");
-
-function switchTrack(track, silent){
-  currentTrack = track;
-  var isCourse = (track === "course");
-  btnCourse.className = "track-btn" + (isCourse ? " active-course" : "");
-  btnComp.className = "track-btn" + (isCourse ? "" : " active-comp");
-  cards.forEach(function(c){
-    var t = c.dataset.track;
-    c.classList.toggle("dim", isCourse ? (t !== "course") : (t !== "comp"));
+/* ===== 数字滚动 ===== */
+var counted = false;
+function runCount(){
+  if(counted) return;
+  counted = true;
+  document.querySelectorAll(".count").forEach(function(el){
+    var to = parseInt(el.dataset.to), suffix = el.dataset.suffix || "";
+    var t0 = null;
+    function tick(ts){
+      if(!t0) t0 = ts;
+      var p = Math.min((ts - t0) / 1100, 1);
+      el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))) + suffix;
+      if(p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   });
-  agentCount.textContent = isCourse ? "3 Course Agents Connected" : "1 Competition Agent Connected";
-  dataBtn.style.display = isCourse ? "" : "none";
-  pipeline.className = isCourse ? "pipeline" : "pipeline comp";
-  plTitle.textContent = isCourse ? "课内数据流 · REAL PIPELINE" : "竞赛数据流 · REAL PIPELINE";
-  plSteps.innerHTML = isCourse ? COURSE_STEPS : COMP_STEPS;
-  if(!silent){
-    var id = isCourse ? 0 : 3;
-    tip.innerHTML = agents[id].tip;
-    // 如果正在对话视图，跟着切
-    if(chatView.style.display === "flex") openChat(id);
-  }
 }
-btnCourse.onclick = function(){ switchTrack("course"); };
-btnComp.onclick = function(){ switchTrack("comp"); };
+
+/* ===== 点击微光点 ===== */
+document.addEventListener("click", function(e){
+  if(e.target.closest("iframe")) return;
+  for(var i = 0; i < 5; i++){
+    var s = document.createElement("span");
+    s.className = "spark";
+    s.style.left = e.clientX + "px";
+    s.style.top = e.clientY + "px";
+    s.style.background = (i % 2) ? "#62d8ff" : "#b58cff";
+    s.style.boxShadow = "0 0 8px " + s.style.background;
+    s.style.setProperty("--dx", (Math.random() * 60 - 30) + "px");
+    s.style.setProperty("--dy", (Math.random() * 60 - 30) + "px");
+    document.body.appendChild(s);
+    setTimeout(function(){ this.remove(); }.bind(s), 650);
+  }
+});
 
 /* ===== 侧栏功能 ===== */
-document.getElementById("sideComp").onclick = function(){ switchTrack("comp"); window.scrollTo(0,0); };
+document.getElementById("sideComp").onclick = function(){ openChat(3); };
 document.getElementById("sideAbout").onclick = function(){
   if(chatView.style.display === "flex"){
     chatView.style.display = "none";
