@@ -1,2614 +1,524 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-
-<title>
-学研智脑 | Multi-Agent Learning OS
-</title>
-
-
+<title>学研智脑 | Multi-Agent Learning OS</title>
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:#e8f2fb;overflow-x:hidden;}
 
-
-/* ===========================
-   GLOBAL
-=========================== */
-
-
-*{
-
-margin:0;
-
-padding:0;
-
-box-sizing:border-box;
-
+/* =========== INTRO =========== */
+#intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 50% 60%,#0d2542 0%,#030712 65%);display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity 1s ease;overflow:hidden;}
+#intro.hide{opacity:0;pointer-events:none;}
+#space{position:absolute;inset:0;}
+.hud{position:absolute;inset:26px;border:1px solid rgba(80,200,255,.13);pointer-events:none;}
+.hud:before{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,transparent,#42d9ff,transparent);animation:scan 4s linear infinite;}
+@keyframes scan{from{transform:translateY(0);}to{transform:translateY(100vh);}}
+.sys-title{text-align:center;z-index:2;margin-bottom:8px;}
+.sys-title h1{font-size:clamp(32px,6vw,56px);letter-spacing:16px;font-weight:900;background:linear-gradient(90deg,#fff,#62d8ff,#b58cff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 40px rgba(80,200,255,.6);}
+.sys-title p{margin-top:10px;font-size:14px;letter-spacing:7px;color:#8db6d8;}
+.core-stage{position:relative;width:min(980px,96vw);height:min(470px,58vh);z-index:2;}
+.core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:170px;height:170px;}
+.hex{position:absolute;inset:0;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:linear-gradient(135deg,#48d8ff,#154d88);box-shadow:0 0 90px #2dcaff;animation:rotateCore 9s linear infinite;}
+.hex-inner{position:absolute;inset:14px;clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);background:#06192d;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:rotateBack 9s linear infinite;}
+.hex-inner b{font-size:20px;letter-spacing:3px;color:#7fe8ff;}
+.hex-inner span{font-size:11px;color:#8aa9c5;margin-top:8px;}
+@keyframes rotateCore{to{transform:rotate(360deg);}}
+@keyframes rotateBack{to{transform:rotate(-360deg);}}
+.core-halo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:280px;height:280px;border-radius:50%;border:1px dashed rgba(80,200,255,.3);animation:rotateCore 20s linear infinite;}
+.core-halo.h2{width:400px;height:400px;border-color:rgba(181,140,255,.18);animation-duration:32s;animation-direction:reverse;}
+.node{position:absolute;width:190px;text-align:center;animation:nodeFloat 5s ease-in-out infinite;}
+@keyframes nodeFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+.node .orb{width:74px;height:74px;margin:0 auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 35px currentColor;}
+.node h3{font-size:17px;margin-bottom:3px;}
+.node small{font-size:11px;color:#7fa8c9;letter-spacing:1px;}
+.node .desc{font-size:11px;color:#5f7d99;margin-top:4px;}
+.n1{left:2%;top:6%;color:#42cfff;}
+.n2{right:2%;top:6%;color:#b58cff;animation-delay:1.2s;}
+.n3{left:8%;bottom:4%;color:#ff9a52;animation-delay:2.4s;}
+.n4{right:8%;bottom:4%;color:#62ff9d;animation-delay:3.6s;}
+.n1 .orb{background:radial-gradient(circle at 32% 30%,#bdeaff,#178bd1 60%,#08233c);}
+.n2 .orb{background:radial-gradient(circle at 32% 30%,#e6d4ff,#7b4de0 60%,#1d0f3c);}
+.n3 .orb{background:radial-gradient(circle at 32% 30%,#ffd9b8,#e0662a 60%,#3c1c08);}
+.n4 .orb{background:radial-gradient(circle at 32% 30%,#c8ffdd,#22a85c 60%,#08301a);}
+.wire{position:absolute;height:1px;background:linear-gradient(90deg,transparent,#46d8ff,transparent);opacity:.45;animation:flow 2s infinite;}
+@keyframes flow{50%{opacity:1;}}
+.w1{width:24%;left:22%;top:26%;transform:rotate(8deg);}
+.w2{width:24%;right:22%;top:26%;transform:rotate(-8deg);}
+.w3{width:24%;left:24%;bottom:24%;transform:rotate(-8deg);}
+.w4{width:24%;right:24%;bottom:24%;transform:rotate(8deg);}
+.boot-line{position:absolute;bottom:74px;width:100%;text-align:center;font-family:Consolas,monospace;color:#82cfff;font-size:13.5px;z-index:2;}
+.progress{width:340px;max-width:70vw;height:5px;margin:12px auto;background:#12263d;overflow:hidden;border-radius:3px;}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#36d8ff,#b58cff);animation:load 4.2s forwards;box-shadow:0 0 10px #36d8ff;}
+@keyframes load{to{width:100%;}}
+#skip{position:absolute;right:36px;bottom:30px;padding:9px 26px;border-radius:30px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.28);color:white;cursor:pointer;z-index:5;font-size:13px;}
+#skip:hover{background:rgba(255,255,255,.15);}
+@media (max-width:900px){
+  .node{width:120px;}
+  .node .orb{width:52px;height:52px;font-size:22px;}
+  .node h3{font-size:13px;}
+  .node .desc{display:none;}
+  .wire{display:none;}
+  .core{width:120px;height:120px;}
 }
 
+/* =========== 公共 =========== */
+.system-bg{position:fixed;inset:0;z-index:-2;background:linear-gradient(135deg,#020611,#081a2d 55%,#04101f);}
+#app{display:flex;flex-direction:column;min-height:100vh;opacity:0;transition:1s;}
+#app.show{opacity:1;}
 
+.topbar{min-height:72px;display:flex;align-items:center;justify-content:space-between;padding:10px 28px;background:rgba(3,12,25,.78);border-bottom:1px solid rgba(80,200,255,.2);backdrop-filter:blur(15px);flex-wrap:wrap;gap:10px;}
+.brand{display:flex;align-items:center;gap:14px;}
+.logo-core{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#45d7ff,#755cff);box-shadow:0 0 25px #45d7ff;font-size:20px;}
+.brand h2{font-size:23px;letter-spacing:5px;}
+.brand p{font-size:10px;color:#7fa8c9;letter-spacing:3px;}
+.top-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.data-link{padding:8px 18px;border-radius:999px;font-size:13px;color:#8fd6ff;border:1px solid rgba(143,214,255,.4);text-decoration:none;transition:.25s;background:rgba(255,255,255,.05);}
+.data-link:hover{background:rgba(143,214,255,.15);box-shadow:0 0 14px rgba(143,214,255,.3);}
+.system-state{font-family:Consolas;font-size:12.5px;color:#55ff9b;}
+.system-state i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#55ff9b;box-shadow:0 0 10px #55ff9b;margin-right:6px;animation:blink 1.6s infinite;}
+@keyframes blink{50%{opacity:.35;}}
 
-body{
+.track{display:flex;gap:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:999px;padding:4px;}
+.track-btn{padding:9px 28px;border-radius:999px;border:none;background:transparent;color:#9db4c8;cursor:pointer;font-size:14.5px;font-weight:600;transition:.25s;}
+.track-btn.active-course{background:linear-gradient(90deg,#178bd1,#43d6ff);color:#fff;box-shadow:0 0 16px rgba(67,214,255,.5);}
+.track-btn.active-comp{background:linear-gradient(90deg,#ff8c42,#ff5f4a);color:#fff;box-shadow:0 0 16px rgba(255,140,66,.55);}
 
+/* =========== 首页视图 =========== */
+#homeView{display:flex;flex:1;padding:18px;gap:18px;}
+.sidebar{width:216px;background:rgba(5,20,38,.78);border:1px solid rgba(100,200,255,.15);border-radius:15px;padding:18px;flex-shrink:0;display:flex;flex-direction:column;}
+.sidebar h3{color:#7edbff;font-size:13px;margin-bottom:16px;letter-spacing:2px;}
+.side-item{padding:11px 12px;margin-bottom:7px;border-radius:10px;color:#9cb8d0;cursor:pointer;transition:.2s;font-size:14px;text-decoration:none;display:block;border:1px solid transparent;}
+.side-item:hover{background:rgba(50,180,255,.08);color:#fff;}
+.side-item.active{background:rgba(50,180,255,.15);color:white;border-color:rgba(80,200,255,.25);}
+.side-foot{margin-top:auto;padding-top:14px;border-top:1px solid rgba(100,200,255,.12);font-size:11.5px;color:#5f7d99;line-height:1.9;}
+.side-foot b{color:#7edbff;font-weight:600;}
 
-background:#020611;
+.main-panel{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0;}
+.agent-header{display:flex;justify-content:space-between;align-items:center;}
+.agent-header span{color:#55ff9b;font-size:12.5px;font-family:Consolas;}
+.agent-tip{font-size:13px;color:#9db4c8;background:rgba(5,20,38,.6);border:1px solid rgba(100,200,255,.12);border-radius:10px;padding:9px 14px;}
+.agent-tip b{color:#ffb273;}
 
+.agent-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+.card{padding:26px 18px;border-radius:16px;background:rgba(8,25,45,.8);border:1px solid rgba(255,255,255,.1);text-align:center;transition:.25s;}
+.card.dim{opacity:.26;filter:grayscale(.7);}
+.card .orb{width:72px;height:72px;margin:0 auto 12px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 28px currentColor;transition:.25s;}
+.card:hover .orb{transform:scale(1.08);}
+.card h3{margin-top:4px;font-size:17px;}
+.card .en{color:#89abc5;font-size:11px;letter-spacing:1px;}
+.card .desc{color:#6d8aa5;font-size:12.5px;margin-top:10px;line-height:1.7;min-height:44px;}
+.card button{margin-top:14px;padding:9px 26px;border-radius:20px;background:transparent;color:white;border:1px solid #55cfff;cursor:pointer;transition:.2s;font-size:13.5px;}
+.card button:hover{background:rgba(85,207,255,.15);}
+.c-blue{color:#42cfff;}.c-blue .orb{background:radial-gradient(circle at 32% 30%,#bdeaff,#178bd1 60%,#08233c);}
+.c-orange{color:#ff9a52;}.c-orange .orb{background:radial-gradient(circle at 32% 30%,#ffd9b8,#e0662a 60%,#3c1c08);}
+.c-orange button{border-color:#ff9955;}
+.c-purple{color:#b58cff;}.c-purple .orb{background:radial-gradient(circle at 32% 30%,#e6d4ff,#7b4de0 60%,#1d0f3c);}
+.c-purple button{border-color:#b785ff;}
+.c-green{color:#62ff9d;}.c-green .orb{background:radial-gradient(circle at 32% 30%,#c8ffdd,#22a85c 60%,#08301a);}
+.c-green button{border-color:#55ff9b;}
 
-font-family:
+.pipeline{background:rgba(5,20,38,.66);border:1px solid rgba(100,200,255,.14);border-radius:14px;padding:14px 18px;}
+.pipeline .pl-title{font-size:12px;color:#7edbff;letter-spacing:2px;margin-bottom:11px;}
+.pl-steps{display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
+.pl-step{padding:8px 15px;border-radius:9px;background:rgba(50,140,220,.12);border:1px solid rgba(80,200,255,.25);font-size:12.5px;color:#bfe0f5;white-space:nowrap;}
+.pl-arrow{color:#46d8ff;font-size:14px;animation:flow 1.6s infinite;}
+.pipeline.comp .pl-step{background:rgba(220,120,50,.1);border-color:rgba(255,150,80,.3);color:#ffd9b8;}
+.pipeline.comp .pl-arrow{color:#ff9a52;}
 
-"Microsoft YaHei",
-"PingFang SC",
-Arial,
-sans-serif;
+.about{background:rgba(5,20,38,.66);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:12px 18px;}
+.about summary{cursor:pointer;color:#8fc7ee;font-size:13.5px;}
+.about .inner{padding-top:12px;font-size:13px;color:#9db4c8;line-height:1.8;}
+.about .inner b{color:#ffb273;}
+.about .inner p{margin-bottom:7px;}
 
-
-color:white;
-
-
-overflow:hidden;
-
-
+/* =========== 对话视图 =========== */
+#chatView{display:none;flex:1;flex-direction:column;padding:16px 18px 20px;}
+.chat-body{display:flex;flex:1;gap:16px;min-height:70vh;}
+.chat-side{width:270px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;}
+.cs-card{background:rgba(5,20,38,.75);border:1px solid rgba(100,200,255,.16);border-radius:15px;padding:18px;}
+.cs-id{display:flex;align-items:center;gap:14px;}
+.cs-orb{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 0 24px currentColor;flex-shrink:0;animation:orbBreath 4s ease-in-out infinite;}
+@keyframes orbBreath{0%,100%{box-shadow:0 0 18px currentColor;}50%{box-shadow:0 0 34px currentColor;}}
+.cs-id h3{font-size:17px;}
+.cs-id .en{font-size:11px;color:#7fa8c9;letter-spacing:1px;margin-top:3px;}
+.cs-desc{margin-top:14px;font-size:12.5px;color:#8aa5bd;line-height:1.8;}
+.cs-card h4{font-size:12px;color:#7edbff;letter-spacing:2px;margin-bottom:10px;}
+.cs-try{font-size:12.5px;color:#9db4c8;line-height:1.7;padding:8px 10px;border-radius:8px;background:rgba(50,140,220,.08);border:1px solid rgba(80,200,255,.14);margin-bottom:8px;}
+.cs-try:before{content:"💬 ";} 
+.cs-pos{font-size:12.5px;color:#9db4c8;line-height:2;}
+.cs-pos .step-on{color:#ffd9a0;font-weight:700;}
+.cs-pos .step-on:before{content:"▶ ";color:#ff9a52;}
+.cs-pos .step-off:before{content:"· ";color:#3d5a75;}
+@media (max-width:900px){
+  .chat-body{flex-direction:column;}
+  .chat-side{width:100%;}
 }
+.chat-head{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+.back-btn{padding:8px 20px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(120,200,255,.3);color:#bfe0f5;cursor:pointer;font-size:13.5px;transition:.2s;}
+.back-btn:hover{background:rgba(80,200,255,.15);}
+.chat-agent-name{font-size:17px;font-weight:700;letter-spacing:1px;}
+.chat-mini-tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.mini-tab{padding:7px 16px;border-radius:999px;font-size:12.5px;cursor:pointer;border:1px solid rgba(255,255,255,.18);color:#9db4c8;background:rgba(255,255,255,.04);transition:.2s;}
+.mini-tab:hover{color:#fff;border-color:rgba(85,207,255,.5);}
+.mini-tab.on{background:rgba(50,160,230,.25);color:#fff;border-color:#55cfff;}
+.ai-window{flex:1;min-height:70vh;background:white;border-radius:15px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 0 50px rgba(58,124,165,.35);}
+.window-head{height:40px;background:#061321;display:flex;justify-content:space-between;align-items:center;padding:0 20px;color:#7edbff;font-family:Consolas;font-size:13px;flex-shrink:0;}
+.window-head .dots{color:#3d5a75;letter-spacing:3px;}
+.ai-window iframe{flex:1;border:none;}
 
-
-
-
-/* ===========================
-   INTRO SYSTEM
-=========================== */
-
-
-#intro{
-
-
-position:fixed;
-
-
-inset:0;
-
-
-z-index:9999;
-
-
-background:
-
-
-radial-gradient(
-circle at center,
-#102a45,
-#030712 65%
-);
-
-
-
-display:flex;
-
-
-justify-content:center;
-
-
-align-items:center;
-
-
-transition:
-
-opacity 1s ease;
-
-
-
+@media (max-width:900px){
+  #homeView{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:6px;align-items:center;padding:12px;}
+  .sidebar h3{width:100%;margin-bottom:6px;}
+  .side-item{margin-bottom:0;padding:8px 12px;}
+  .side-foot{display:none;}
 }
-
-
-
-
-
-#intro.hide{
-
-
-opacity:0;
-
-
-pointer-events:none;
-
-
-}
-
-
-
-
-
-/* 星空Canvas */
-
-
-#space{
-
-
-position:absolute;
-
-
-inset:0;
-
-
-}
-
-
-
-
-/* HUD扫描 */
-
-
-.hud{
-
-
-position:absolute;
-
-
-inset:30px;
-
-
-border:
-
-1px solid rgba(80,200,255,.15);
-
-
-
-}
-
-
-
-.hud:before{
-
-
-content:"";
-
-
-position:absolute;
-
-
-left:0;
-
-
-top:0;
-
-
-width:100%;
-
-
-height:2px;
-
-
-background:
-
-linear-gradient(
-90deg,
-transparent,
-#42d9ff,
-transparent
-);
-
-
-animation:
-
-scan 4s linear infinite;
-
-
-
-}
-
-
-
-@keyframes scan{
-
-
-from{
-
-transform:translateY(0);
-
-}
-
-
-to{
-
-transform:translateY(100vh);
-
-}
-
-
-}
-
-
-
-
-/* ===========================
-   TITLE
-=========================== */
-
-
-.system-title{
-
-
-position:absolute;
-
-
-top:80px;
-
-
-text-align:center;
-
-
-width:100%;
-
-
-}
-
-
-
-.system-title h1{
-
-
-font-size:52px;
-
-
-letter-spacing:18px;
-
-
-font-weight:900;
-
-
-background:
-
-linear-gradient(
-90deg,
-#ffffff,
-#62d8ff,
-#b58cff
-);
-
-
--webkit-background-clip:text;
-
-
-color:transparent;
-
-
-
-text-shadow:
-
-0 0 40px rgba(80,200,255,.7);
-
-
-
-}
-
-
-
-
-.system-title p{
-
-
-margin-top:15px;
-
-
-font-size:16px;
-
-
-letter-spacing:8px;
-
-
-color:#8db6d8;
-
-
-}
-
-
-
-
-
-/* ===========================
-   CORE
-=========================== */
-
-
-.core-area{
-
-
-position:relative;
-
-
-width:800px;
-
-
-height:500px;
-
-
-}
-
-
-
-
-
-.core{
-
-
-position:absolute;
-
-
-left:50%;
-
-
-top:50%;
-
-
-transform:
-
-translate(-50%,-50%);
-
-
-width:180px;
-
-
-height:180px;
-
-
-}
-
-
-
-.hex{
-
-
-position:absolute;
-
-
-inset:0;
-
-
-clip-path:
-
-polygon(
-50% 0%,
-93% 25%,
-93% 75%,
-50% 100%,
-7% 75%,
-7% 25%
-);
-
-
-
-background:
-
-linear-gradient(
-135deg,
-#48d8ff,
-#154d88
-);
-
-
-
-box-shadow:
-
-0 0 80px #2dcaff;
-
-
-
-animation:
-
-rotateCore 8s linear infinite;
-
-
-
-}
-
-
-
-.hex-inner{
-
-
-position:absolute;
-
-
-inset:15px;
-
-
-
-clip-path:
-
-polygon(
-50% 0%,
-93% 25%,
-93% 75%,
-50% 100%,
-7% 75%,
-7% 25%
-);
-
-
-
-background:#06192d;
-
-
-
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:center;
-
-
-flex-direction:column;
-
-
-
-}
-
-
-
-.hex-inner b{
-
-
-font-size:22px;
-
-
-letter-spacing:3px;
-
-
-color:#7fe8ff;
-
-
-}
-
-
-
-.hex-inner span{
-
-
-font-size:12px;
-
-
-color:#8aa9c5;
-
-
-margin-top:8px;
-
-
-}
-
-
-
-@keyframes rotateCore{
-
-
-to{
-
-
-transform:
-
-rotate(360deg);
-
-
-}
-
-
-}
-
-
-
-
-
-/* ===========================
-   AGENT CARD
-=========================== */
-
-
-
-.agent{
-
-
-position:absolute;
-
-
-width:170px;
-
-
-height:110px;
-
-
-background:
-
-
-linear-gradient(
-135deg,
-rgba(20,50,80,.85),
-rgba(5,15,30,.8)
-);
-
-
-
-border:
-
-
-1px solid rgba(80,200,255,.35);
-
-
-
-backdrop-filter:
-
-blur(10px);
-
-
-
-padding:18px;
-
-
-
-border-radius:12px;
-
-
-
-box-shadow:
-
-
-0 0 30px rgba(40,180,255,.25);
-
-
-
-}
-
-
-
-.agent h3{
-
-
-font-size:17px;
-
-
-margin-bottom:5px;
-
-
-}
-
-
-
-.agent small{
-
-
-color:#83cfff;
-
-
-}
-
-
-
-.agent .status{
-
-
-margin-top:12px;
-
-
-font-size:11px;
-
-
-color:#52ff9a;
-
-
-}
-
-
-
-
-/* 四个Agent位置 */
-
-
-.agent1{
-
-
-left:0;
-
-
-top:70px;
-
-
-border-color:#42cfff;
-
-
-}
-
-
-
-.agent2{
-
-
-right:0;
-
-
-top:70px;
-
-
-border-color:#ff9a52;
-
-
-}
-
-
-
-.agent3{
-
-
-left:0;
-
-
-bottom:70px;
-
-
-border-color:#a97cff;
-
-
-}
-
-
-
-.agent4{
-
-
-right:0;
-
-
-bottom:70px;
-
-
-border-color:#62ff9d;
-
-
-}
-
-
-
-
-
-
-/* ===========================
-   CONNECT LINE
-=========================== */
-
-
-.line{
-
-
-position:absolute;
-
-
-height:1px;
-
-
-background:
-
-linear-gradient(
-90deg,
-transparent,
-#46d8ff,
-transparent
-);
-
-
-
-opacity:.5;
-
-
-animation:
-
-flow 2s infinite;
-
-
-
-}
-
-
-
-@keyframes flow{
-
-
-50%{
-
-opacity:1;
-
-}
-
-
-}
-
-
-
-
-.l1{
-
-
-width:220px;
-
-
-left:170px;
-
-
-top:160px;
-
-
-}
-
-
-
-.l2{
-
-
-width:220px;
-
-
-right:170px;
-
-
-top:160px;
-
-
-}
-
-
-
-
-.l3{
-
-
-width:220px;
-
-
-left:170px;
-
-
-bottom:160px;
-
-
-}
-
-
-
-.l4{
-
-
-width:220px;
-
-
-right:170px;
-
-
-bottom:160px;
-
-
-}
-
-
-
-
-
-/* ===========================
-   SYSTEM STATUS
-=========================== */
-
-
-.status-panel{
-
-
-position:absolute;
-
-
-bottom:70px;
-
-
-width:100%;
-
-
-text-align:center;
-
-
-
-font-family:
-
-Consolas,
-monospace;
-
-
-
-color:#82cfff;
-
-
-}
-
-
-
-
-.progress{
-
-
-width:360px;
-
-
-height:5px;
-
-
-margin:15px auto;
-
-
-background:#12263d;
-
-
-overflow:hidden;
-
-
-}
-
-
-
-.progress span{
-
-
-display:block;
-
-
-height:100%;
-
-
-width:0;
-
-
-background:
-
-linear-gradient(
-90deg,
-#36d8ff,
-#b58cff
-);
-
-
-
-animation:
-
-load 4s forwards;
-
-
-}
-
-
-
-@keyframes load{
-
-
-to{
-
-width:100%;
-
-}
-
-
-}
-
-
-
-#skip{
-
-
-position:absolute;
-
-
-right:40px;
-
-
-bottom:35px;
-
-
-padding:
-
-10px 28px;
-
-
-border-radius:30px;
-
-
-background:
-
-rgba(255,255,255,.05);
-
-
-
-border:
-
-1px solid rgba(255,255,255,.3);
-
-
-
-color:white;
-
-
-cursor:pointer;
-
-
-}
-
-
-
 </style>
-<!-- =========================
-     MAIN SYSTEM
-========================= -->
+</head>
+<body>
 
+<!-- =========== INTRO =========== -->
+<div id="intro">
+  <canvas id="space"></canvas>
+  <div class="hud"></div>
+  <div class="sys-title">
+    <h1>学研智脑</h1>
+    <p>MULTI-AGENT LEARNING OS · 多智能体协同 · 赋能教与学</p>
+  </div>
+  <div class="core-stage">
+    <div class="wire w1"></div><div class="wire w2"></div>
+    <div class="wire w3"></div><div class="wire w4"></div>
+    <div class="core-halo"></div><div class="core-halo h2"></div>
+    <div class="node n1"><div class="orb">🔍</div><h3>错题诊疗师</h3><small>Diagnosis Agent</small><div class="desc">识别错因 / 精准诊断 / 建档归类</div></div>
+    <div class="node n2"><div class="orb">📊</div><h3>学情分析师</h3><small>Insight Agent</small><div class="desc">学情画像 / 薄弱点分析 / 策略建议</div></div>
+    <div class="node n3"><div class="orb">⚔️</div><h3>错题教官</h3><small>Coach Agent</small><div class="desc">找茬训练 / 陷阱造题 / 能力强化</div></div>
+    <div class="node n4"><div class="orb">🏆</div><h3>竞赛数据分析师</h3><small>Competition Agent</small><div class="desc">数据计算 / 统计分析 / 可视化报告</div></div>
+    <div class="core"><div class="hex"><div class="hex-inner"><b>核心引擎</b><span>4 AGENTS LINKED</span></div></div></div>
+  </div>
+  <div class="boot-line">SYSTEM INITIALIZING · 多智能体协作引擎启动中
+    <div class="progress"><span></span></div>
+  </div>
+  <button id="skip">跳过动画 ≫</button>
+</div>
 
+<!-- =========== MAIN =========== -->
 <div class="system-bg"></div>
 
-
-
 <div id="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-core">◇</div>
+      <div><h2>学研智脑</h2><p>MULTI-AGENT LEARNING OS</p></div>
+    </div>
+    <div class="track">
+      <button id="btnCourse" class="track-btn active-course">📖 课内微积分</button>
+      <button id="btnComp" class="track-btn">🏆 课外竞赛</button>
+    </div>
+    <div class="top-right">
+      <a class="data-link" id="dataBtn" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 实时错题数据</a>
+      <div class="system-state"><i></i>SYSTEM ONLINE</div>
+    </div>
+  </header>
 
+  <!-- 首页视图 -->
+  <div id="homeView">
+    <aside class="sidebar">
+      <h3>NAVIGATION</h3>
+      <div class="side-item active">◉ 智能体中心</div>
+      <a class="side-item" href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh" target="_blank">📒 错题数据底座</a>
+      <div class="side-item" id="sideComp">🏆 竞赛分析中心</div>
+      <div class="side-item" id="sideAbout">ℹ️ 关于本系统</div>
+      <div class="side-foot">
+        数据底座：<b>飞书多维表格</b><br>
+        知识库：<b>30+ 定理易错点卡片</b><br>
+        编排引擎：<b>Dify 工作流</b>
+      </div>
+    </aside>
 
+    <section class="main-panel">
+      <div class="agent-header">
+        <h2>当前智能体网络</h2>
+        <span id="agentCount">3 Course Agents Connected</span>
+      </div>
 
-<!-- 顶部导航 -->
+      <div class="agent-tip" id="tip">🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。点击卡片进入对话。</div>
 
-<header class="topbar">
+      <div class="agent-cards">
+        <div class="card c-blue" data-track="course">
+          <div class="orb">🔍</div>
+          <h3>错题诊疗师</h3><div class="en">Diagnosis Agent</div>
+          <div class="desc">拍照上传错题，智能识别四类错因，精准诊断并生成诊疗建议</div>
+          <button class="enter-agent" data-agent="0">进入对话 →</button>
+        </div>
+        <div class="card c-orange" data-track="course">
+          <div class="orb">⚔️</div>
+          <h3>错题教官</h3><div class="en">Coach Agent</div>
+          <div class="desc">AI 找茬批改 + 定向陷阱造题，针对错误习惯强化薄弱点</div>
+          <button class="enter-agent" data-agent="1">进入对话 →</button>
+        </div>
+        <div class="card c-purple" data-track="course">
+          <div class="orb">📊</div>
+          <h3>学情分析师</h3><div class="en">Insight Agent</div>
+          <div class="desc">基于错题本数据，生成个人/班级学情画像与复习优先级</div>
+          <button class="enter-agent" data-agent="2">进入对话 →</button>
+        </div>
+        <div class="card c-green dim" data-track="comp">
+          <div class="orb">🏆</div>
+          <h3>竞赛数据分析师</h3><div class="en">Competition Agent</div>
+          <div class="desc">上传 Excel/CSV，代码精确计算统计量，AI 生成分析报告与图表</div>
+          <button class="enter-agent" data-agent="3">进入对话 →</button>
+        </div>
+      </div>
 
+      <div class="pipeline" id="pipeline">
+        <div class="pl-title" id="plTitle">课内数据流 · REAL PIPELINE</div>
+        <div class="pl-steps" id="plSteps">
+          <span class="pl-step">📷 拍照上传错题</span><span class="pl-arrow">→</span>
+          <span class="pl-step">🔍 AI 错因诊断</span><span class="pl-arrow">→</span>
+          <span class="pl-step">📒 写入飞书错题本</span><span class="pl-arrow">→</span>
+          <span class="pl-step">⚔️ 攻防训练</span><span class="pl-arrow">→</span>
+          <span class="pl-step">📊 学情报告</span>
+        </div>
+      </div>
 
+      <div class="about" id="aboutBox" style="display:none;">
+        <details open>
+          <summary>关于本系统</summary>
+          <div class="inner">
+            <p><b>这是什么：</b>一套多智能体协作的学习支持平台——课内微积分：诊疗师诊断建档、教官攻防训练、分析师生成学情报告，三个智能体共享同一个错题本数据底座；课外竞赛：数据分析师接收 Excel 数据表，由代码精确计算统计量，AI 生成分析报告与可视化图表。</p>
+            <p><b>为什么通用大模型替代不了：</b>通用大模型对话一关就忘，只对答案负责；本系统能记住每个学生错在哪、识别"答案碰巧对但过程错误"的假掌握；数据分析场景中所有数字由代码计算而非模型估算，保证零错误。</p>
+            <p><b>参赛作品：</b>"AI赋能教·学·管"智能体开发竞赛 · 学习支持类</p>
+          </div>
+        </details>
+      </div>
+    </section>
+  </div>
 
-<div class="brand">
-
-
-<div class="logo-core">
-
-◇
-
+  <!-- 对话视图 -->
+  <div id="chatView">
+    <div class="chat-head">
+      <button class="back-btn" id="backBtn">← 返回智能体中心</button>
+      <span class="chat-agent-name" id="chatName">错题诊疗师</span>
+      <div class="chat-mini-tabs" id="miniTabs"></div>
+    </div>
+    <div class="chat-body">
+      <div class="chat-side">
+        <div class="cs-card">
+          <div class="cs-id">
+            <div class="cs-orb" id="csOrb">🔍</div>
+            <div><h3 id="csName">错题诊疗师</h3><div class="en" id="csEn">Diagnosis Agent</div></div>
+          </div>
+          <div class="cs-desc" id="csDesc"></div>
+        </div>
+        <div class="cs-card">
+          <h4>试试这样说</h4>
+          <div id="csTry"></div>
+        </div>
+        <div class="cs-card">
+          <h4>在数据流中的位置</h4>
+          <div class="cs-pos" id="csPos"></div>
+        </div>
+      </div>
+      <div class="ai-window">
+        <div class="window-head"><span id="winTitle">AI WORKSPACE · 错题诊疗师</span><span class="dots">● ● ●</span></div>
+        <iframe id="agentFrame" src="about:blank" allow="microphone;clipboard-write"></iframe>
+      </div>
+    </div>
+  </div>
 </div>
 
-
-
-<div>
-
-
-<h2>
-学研智脑
-</h2>
-
-
-<p>
-MULTI-AGENT LEARNING OS
-</p>
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-<div class="track">
-
-
-<button 
-id="btnCourse"
-class="track-btn active">
-
-
-📖 课内微积分
-
-
-</button>
-
-
-
-<button
-id="btnComp"
-class="track-btn">
-
-
-🏆 课外竞赛
-
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-<div class="system-state">
-
-
-<span></span>
-
-
-SYSTEM ONLINE
-
-
-</div>
-
-
-
-</header>
-
-
-
-
-
-
-<!-- 主区域 -->
-
-
-<div class="workspace">
-
-
-
-<!-- 左侧 -->
-
-
-<aside class="sidebar">
-
-
-
-<h3>
-AGENT CENTER
-</h3>
-
-
-
-
-<div class="side-item active">
-
-◉ 智能体中心
-
-</div>
-
-
-
-<div class="side-item">
-
-◌ 学习数据
-
-</div>
-
-
-
-<div class="side-item">
-
-◌ 错题知识库
-
-</div>
-
-
-
-<div class="side-item">
-
-◌ 学习画像
-
-</div>
-
-
-
-<div class="side-item">
-
-◌ 竞赛分析
-
-</div>
-
-
-
-
-
-<div class="profile">
-
-
-<div class="avatar">
-
-AI
-
-</div>
-
-
-<div>
-
-
-<b>
-Student
-</b>
-
-
-<p>
-Learning Level Lv.17
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-</aside>
-
-
-
-
-
-
-
-
-
-<!-- 中间 -->
-
-
-<section class="main-panel">
-
-
-
-<div class="agent-header">
-
-
-<h2>
-
-当前智能体网络
-
-</h2>
-
-
-<span>
-
-4 Agents Connected
-
-</span>
-
-
-
-</div>
-
-
-
-
-
-
-<div class="agent-cards">
-
-
-
-<div class="card blue">
-
-
-<div class="icon">
-
-🔍
-
-</div>
-
-
-<h3>
-错题诊疗师
-</h3>
-
-
-<p>
-Diagnosis Agent
-</p>
-
-
-<button
-class="enter-agent"
-data-agent="0">
-
-进入对话 →
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card orange">
-
-
-<div class="icon">
-
-⚔️
-
-</div>
-
-
-<h3>
-错题教官
-</h3>
-
-
-<p>
-Coach Agent
-</p>
-
-
-<button
-class="enter-agent"
-data-agent="1">
-
-进入对话 →
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-<div class="card purple">
-
-
-<div class="icon">
-
-📊
-
-</div>
-
-
-<h3>
-学情分析师
-</h3>
-
-
-<p>
-Insight Agent
-</p>
-
-
-<button
-class="enter-agent"
-data-agent="2">
-
-进入对话 →
-
-</button>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="card green">
-
-
-<div class="icon">
-
-🏆
-
-</div>
-
-
-<h3>
-竞赛分析师
-</h3>
-
-
-<p>
-Competition Agent
-</p>
-
-
-<button
-class="enter-agent"
-data-agent="3">
-
-进入对话 →
-
-</button>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-
-<!-- iframe -->
-
-
-<div class="ai-window">
-
-
-<div class="window-head">
-
-
-<span>
-AI WORKSPACE
-</span>
-
-
-<div>
-
-● ● ●
-
-</div>
-
-
-</div>
-
-
-
-
-<iframe
-
-id="agentFrame"
-
-src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
-
-allow="microphone;clipboard-write">
-
-</iframe>
-
-
-
-</div>
-
-
-
-
-</section>
-
-
-
-
-
-
-
-</div>
-
-
-
-
-
-</div>
-
-
-
-
-
-<style>
-
-
-/* =========================
-   DASHBOARD STYLE
-========================= */
-
-
-.system-bg{
-
-
-position:fixed;
-
-
-inset:0;
-
-
-z-index:-2;
-
-
-background:
-
-linear-gradient(
-135deg,
-#020611,
-#081a2d
-);
-
-
-}
-
-
-
-#app{
-
-
-display:flex;
-
-
-flex-direction:column;
-
-
-height:100vh;
-
-
-opacity:0;
-
-
-transition:1s;
-
-
-}
-
-
-
-#app.show{
-
-
-opacity:1;
-
-
-}
-
-
-
-
-.topbar{
-
-
-height:75px;
-
-
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:space-between;
-
-
-padding:
-
-0 30px;
-
-
-background:
-
-rgba(3,12,25,.75);
-
-
-
-border-bottom:
-
-1px solid rgba(80,200,255,.2);
-
-
-backdrop-filter:
-
-blur(15px);
-
-
-
-}
-
-
-
-
-.brand{
-
-
-display:flex;
-
-
-align-items:center;
-
-
-gap:15px;
-
-
-}
-
-
-
-
-.logo-core{
-
-
-width:45px;
-
-
-height:45px;
-
-
-border-radius:12px;
-
-
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:center;
-
-
-background:
-
-linear-gradient(
-135deg,
-#45d7ff,
-#755cff
-);
-
-
-box-shadow:
-
-0 0 25px #45d7ff;
-
-
-}
-
-
-
-.brand h2{
-
-
-font-size:24px;
-
-
-letter-spacing:5px;
-
-
-}
-
-
-
-.brand p{
-
-
-font-size:10px;
-
-
-color:#7fa8c9;
-
-
-letter-spacing:3px;
-
-
-}
-
-
-
-
-
-
-
-.track{
-
-
-display:flex;
-
-
-gap:10px;
-
-
-}
-
-
-
-.track-btn{
-
-
-padding:
-
-10px 30px;
-
-
-border-radius:25px;
-
-
-border:
-
-1px solid rgba(120,200,255,.3);
-
-
-background:
-
-rgba(255,255,255,.05);
-
-
-color:white;
-
-
-cursor:pointer;
-
-
-}
-
-
-
-.track-btn.active{
-
-
-background:
-
-linear-gradient(
-90deg,
-#178bd1,
-#43d6ff
-);
-
-
-
-}
-
-
-
-
-
-.system-state{
-
-
-font-family:
-
-Consolas;
-
-
-font-size:13px;
-
-
-color:#55ff9b;
-
-
-}
-
-
-
-.system-state span{
-
-
-display:inline-block;
-
-
-width:8px;
-
-
-height:8px;
-
-
-border-radius:50%;
-
-
-background:#55ff9b;
-
-
-box-shadow:
-
-0 0 10px #55ff9b;
-
-
-}
-
-
-
-
-.workspace{
-
-
-display:flex;
-
-
-flex:1;
-
-
-padding:20px;
-
-
-gap:20px;
-
-
-}
-
-
-
-
-
-
-
-.sidebar{
-
-
-width:220px;
-
-
-background:
-
-rgba(5,20,38,.75);
-
-
-border:
-
-1px solid rgba(100,200,255,.15);
-
-
-border-radius:15px;
-
-
-padding:20px;
-
-
-
-}
-
-
-
-.sidebar h3{
-
-
-color:#7edbff;
-
-
-font-size:14px;
-
-
-margin-bottom:20px;
-
-
-}
-
-
-
-.side-item{
-
-
-padding:
-
-12px;
-
-
-margin-bottom:8px;
-
-
-border-radius:10px;
-
-
-color:#9cb8d0;
-
-
-}
-
-
-
-.side-item.active{
-
-
-background:
-
-rgba(50,180,255,.15);
-
-
-color:white;
-
-
-}
-
-
-
-.profile{
-
-
-margin-top:50px;
-
-
-display:flex;
-
-
-gap:10px;
-
-
-align-items:center;
-
-
-color:#9cc;
-
-
-}
-
-
-
-.avatar{
-
-
-width:45px;
-
-
-height:45px;
-
-
-border-radius:50%;
-
-
-background:
-
-linear-gradient(
-135deg,
-#36d8ff,
-#814dff
-);
-
-
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:center;
-
-
-}
-
-
-
-
-.main-panel{
-
-
-flex:1;
-
-
-display:flex;
-
-
-flex-direction:column;
-
-
-gap:15px;
-
-
-}
-
-
-
-
-.agent-header{
-
-
-display:flex;
-
-
-justify-content:space-between;
-
-
-}
-
-
-
-.agent-header span{
-
-
-color:#55ff9b;
-
-
-}
-
-
-
-
-.agent-cards{
-
-
-display:grid;
-
-
-grid-template-columns:
-
-repeat(4,1fr);
-
-
-gap:15px;
-
-
-}
-
-
-
-.card{
-
-
-padding:
-
-20px;
-
-
-border-radius:15px;
-
-
-background:
-
-rgba(8,25,45,.8);
-
-
-border:
-
-1px solid rgba(255,255,255,.1);
-
-
-text-align:center;
-
-
-}
-
-
-
-.card .icon{
-
-
-font-size:35px;
-
-
-}
-
-
-
-
-.card p{
-
-
-color:#89abc5;
-
-
-font-size:12px;
-
-
-}
-
-
-
-.card button{
-
-
-margin-top:15px;
-
-
-padding:
-
-8px 20px;
-
-
-border-radius:20px;
-
-
-background:
-
-transparent;
-
-
-color:white;
-
-
-border:
-
-1px solid #55cfff;
-
-
-cursor:pointer;
-
-
-}
-
-
-
-.orange button{
-
-border-color:#ff9955;
-
-}
-
-
-.purple button{
-
-border-color:#b785ff;
-
-}
-
-
-.green button{
-
-border-color:#55ff9b;
-
-}
-
-
-
-
-
-
-
-.ai-window{
-
-
-flex:1;
-
-
-background:white;
-
-
-border-radius:15px;
-
-
-overflow:hidden;
-
-
-display:flex;
-
-
-flex-direction:column;
-
-
-}
-
-
-
-.window-head{
-
-
-height:40px;
-
-
-background:#061321;
-
-
-display:flex;
-
-
-justify-content:space-between;
-
-
-align-items:center;
-
-
-padding:0 20px;
-
-
-color:#7edbff;
-
-
-}
-
-
-
-
-.ai-window iframe{
-
-
-flex:1;
-
-
-border:none;
-
-
-}
-
-
-
-</style>
 <script>
-
-
-/* ==================================
-   INTRO -> SYSTEM
-================================== */
-
-
-const intro =
-document.getElementById("intro");
-
-
-const app =
-document.getElementById("app");
-
-
-
-let entered=false;
-
-
-
+/* ===== INTRO ===== */
+var intro = document.getElementById("intro");
+var app = document.getElementById("app");
+var entered = false;
 function enterSystem(){
-
-
-if(entered)
-return;
-
-
-
-entered=true;
-
-
-
-intro.classList.add("hide");
-
-
-
-setTimeout(()=>{
-
-
-app.classList.add("show");
-
-
-},800);
-
-
-
+  if(entered) return;
+  entered = true;
+  intro.classList.add("hide");
+  setTimeout(function(){ app.classList.add("show"); }, 300);
 }
+setTimeout(enterSystem, 5200);
+document.getElementById("skip").onclick = enterSystem;
 
-
-
-
-
-// 自动进入
-
-setTimeout(
-enterSystem,
-5200
-);
-
-
-
-// 跳过按钮
-
-document
-.getElementById("skip")
-.onclick=
-enterSystem;
-
-
-
-
-
-
-
-/* ==================================
-   SPACE PARTICLES
-================================== */
-
-
-const canvas =
-document.getElementById("space");
-
-
-const ctx =
-canvas.getContext("2d");
-
-
-
-let stars=[];
-
-
-
-function resize(){
-
-
-canvas.width =
-window.innerWidth;
-
-
-canvas.height =
-window.innerHeight;
-
-
-}
-
-
-
+/* ===== 星空 ===== */
+var canvas = document.getElementById("space");
+var ctx = canvas.getContext("2d");
+var stars = [];
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
 resize();
-
-
-
-window.addEventListener(
-"resize",
-resize
-);
-
-
-
-
-
-for(
-let i=0;
-i<160;
-i++
-){
-
-
-stars.push({
-
-
-x:
-Math.random()*innerWidth,
-
-
-y:
-Math.random()*innerHeight,
-
-
-r:
-Math.random()*2+0.5,
-
-
-speed:
-Math.random()*0.5+0.1
-
-
-
-});
-
-
+window.addEventListener("resize", resize);
+for(var i=0;i<160;i++){
+  stars.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+              r:Math.random()*2+0.5, speed:Math.random()*0.5+0.1});
 }
-
-
-
-
-
-
-
 function animateStars(){
-
-
-ctx.clearRect(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-
-
-stars.forEach(s=>{
-
-
-s.y+=s.speed;
-
-
-
-if(
-s.y>canvas.height
-)
-
-s.y=0;
-
-
-
-ctx.beginPath();
-
-
-
-ctx.arc(
-s.x,
-s.y,
-s.r,
-0,
-Math.PI*2
-);
-
-
-
-ctx.fillStyle=
-"rgba(100,210,255,.8)";
-
-
-ctx.fill();
-
-
-
-});
-
-
-
-requestAnimationFrame(
-animateStars
-);
-
-
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  stars.forEach(function(s){
+    s.y += s.speed;
+    if(s.y > canvas.height) s.y = 0;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(100,210,255,.8)";
+    ctx.fill();
+  });
+  requestAnimationFrame(animateStars);
 }
-
-
-
 animateStars();
 
-
-
-
-
-
-
-
-/* ==================================
-   AGENT DATA
-================================== */
-
-
-
-const agents=[
-
-
-{
-
-url:
-
-"https://udify.app/chatbot/zPNLhszEZfxDXrHD",
-
-tip:
-
-"🔍 错题诊疗师：识别错因，建立个人错题知识画像。"
-
-},
-
-
-
-{
-
-
-url:
-
-"https://udify.app/chatbot/MLPSYJvA2xRcuQxv",
-
-
-tip:
-
-"⚔️ 错题教官：通过找茬训练和陷阱题强化能力。"
-
-
-},
-
-
-
-
-{
-
-
-url:
-
-"https://udify.app/chatbot/qVngF5df6eA6DKuP",
-
-
-tip:
-
-"📊 学情分析师：生成学习画像和薄弱点分析。"
-
-
-},
-
-
-
-
-{
-
-
-url:
-
-"https://udify.app/chatbot/xD2yYF586oTgpGYc",
-
-
-tip:
-
-"🏆 竞赛数据分析师：Excel数据分析与可视化生成。"
-
-
-}
-
-
-
+/* ===== AGENT 数据 ===== */
+var agents = [
+  {name:"错题诊疗师", short:"诊疗师", en:"Diagnosis Agent", icon:"🔍", color:"#42cfff",
+   orbBg:"radial-gradient(circle at 32% 30%,#bdeaff,#178bd1 60%,#08233c)",
+   url:"https://udify.app/chatbot/zPNLhszEZfxDXrHD",
+   tip:"🔍 <b>错题诊疗师</b>：拍照上传错题，诊断错因（概念不清/条件误用/计算失误/思路错误），确认后自动存入专属错题本。",
+   desc:"多模态识别题目与你的解题过程，结合私有定理知识库检索，定位四类错因并给出精确到章节的复习建议。",
+   try:["这道题我哪里做错了？（拍照上传题目+过程）","只拍了题目和答案，帮我看看","确认诊断，存入错题本"],
+   pos:["拍照上传错题","AI 错因诊断","写入飞书错题本","攻防训练","学情报告"], posIdx:1},
+  {name:"错题教官", short:"教官", en:"Coach Agent", icon:"⚔️", color:"#ff9a52",
+   orbBg:"radial-gradient(circle at 32% 30%,#ffd9b8,#e0662a 60%,#3c1c08)",
+   url:"https://udify.app/chatbot/MLPSYJvA2xRcuQxv",
+   tip:"⚔️ <b>错题教官</b>：发送「找茬模式」批改 AI 故意埋错的解答，或发送「陷阱定制」让 AI 为你的错误习惯量身造题。",
+   desc:"两种训练模式：找茬模式让你批改 AI 故意埋错的解答；陷阱定制针对你的错误习惯量身造题，答错才揭示陷阱。",
+   try:["找茬模式","陷阱定制：我总在广义积分上直接套公式","我答完了，帮我看看对不对"],
+   pos:["拍照上传错题","AI 错因诊断","写入飞书错题本","攻防训练","学情报告"], posIdx:3},
+  {name:"学情分析师", short:"学情", en:"Insight Agent", icon:"📊", color:"#b58cff",
+   orbBg:"radial-gradient(circle at 32% 30%,#e6d4ff,#7b4de0 60%,#1d0f3c)",
+   url:"https://udify.app/chatbot/qVngF5df6eA6DKuP",
+   tip:"📊 <b>学情分析师</b>：读取错题本数据，生成个人薄弱点画像与复习优先级；教师视角可查看全班高频错误榜。",
+   desc:"实时读取飞书错题本，把零散的错题记录转化为薄弱点画像、复习优先级；教师视角可生成全班高频错误榜。",
+   try:["帮我分析一下我的错题情况","我这周该优先复习什么","（教师）班里哪些错误最高频？"],
+   pos:["拍照上传错题","AI 错因诊断","写入飞书错题本","攻防训练","学情报告"], posIdx:4},
+  {name:"竞赛数据分析师", short:"竞赛分析", en:"Competition Agent", icon:"🏆", color:"#62ff9d",
+   orbBg:"radial-gradient(circle at 32% 30%,#c8ffdd,#22a85c 60%,#08301a)",
+   url:"https://udify.app/chatbot/xD2yYF586oTgpGYc",
+   tip:"🏆 <b>竞赛数据分析师</b>：上传 Excel/CSV 数据表，代码精确计算统计量，AI 自动生成分析报告与可视化图表——代码负责算，AI 负责讲，数字零错误。",
+   desc:"上传数据表后，由 Python 代码精确计算统计量（零幻觉），AI 负责解读与写作，自动生成可写入竞赛论文的分析段落和可视化图表。",
+   try:["（直接上传 Excel 文件）","帮我分析这份数据","重点分析两类之间的差异"],
+   pos:["上传 Excel/CSV","文档提取","代码精确计算","AI 分析报告","自动生成图表"], posIdx:3}
 ];
 
+var iframe = document.getElementById("agentFrame");
+var tip = document.getElementById("tip");
+var winTitle = document.getElementById("winTitle");
+var chatName = document.getElementById("chatName");
+var cards = document.querySelectorAll(".card");
+var pipeline = document.getElementById("pipeline");
+var plTitle = document.getElementById("plTitle");
+var plSteps = document.getElementById("plSteps");
+var homeView = document.getElementById("homeView");
+var chatView = document.getElementById("chatView");
+var miniTabs = document.getElementById("miniTabs");
+var currentTrack = "course";
+var currentAgent = 0;
 
+var COURSE_STEPS = '<span class="pl-step">📷 拍照上传错题</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">🔍 AI 错因诊断</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">📒 写入飞书错题本</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">⚔️ 攻防训练</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">📊 学情报告</span>';
+var COMP_STEPS = '<span class="pl-step">📁 上传 Excel/CSV</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">📄 文档提取</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">🐍 代码精确计算</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">🤖 AI 分析报告</span><span class="pl-arrow">→</span>'
+  + '<span class="pl-step">📈 自动生成图表</span>';
 
+/* ===== 进入对话视图 ===== */
+function openChat(id){
+  currentAgent = id;
+  var a = agents[id];
+  iframe.src = a.url;
+  chatName.textContent = a.name;
+  winTitle.textContent = "AI WORKSPACE · " + a.name;
+  // 左侧信息面板
+  var orb = document.getElementById("csOrb");
+  orb.textContent = a.icon;
+  orb.style.background = a.orbBg;
+  orb.style.color = a.color;
+  document.getElementById("csName").textContent = a.name;
+  document.getElementById("csEn").textContent = a.en;
+  document.getElementById("csDesc").textContent = a.desc;
+  document.getElementById("csTry").innerHTML = a.try.map(function(t){
+    return '<div class="cs-try">' + t + '</div>';
+  }).join("");
+  document.getElementById("csPos").innerHTML = a.pos.map(function(s, i){
+    return '<div class="' + (i === a.posIdx ? "step-on" : "step-off") + '">' + s + '</div>';
+  }).join("");
+  // 构建 mini tabs（当前赛道的 agent）
+  var ids = (currentTrack === "course") ? [0,1,2] : [3];
+  miniTabs.innerHTML = "";
+  ids.forEach(function(i){
+    var b = document.createElement("button");
+    b.className = "mini-tab" + (i === id ? " on" : "");
+    b.textContent = agents[i].short;
+    b.onclick = function(){ openChat(i); };
+    miniTabs.appendChild(b);
+  });
+  homeView.style.display = "none";
+  chatView.style.display = "flex";
+  window.scrollTo(0,0);
+}
 
-
-
-
-
-const iframe =
-document.getElementById(
-"agentFrame"
-);
-
-
-
-
-
-
-const cards =
-document.querySelectorAll(
-".enter-agent"
-);
-
-
-
-
-
-
-cards.forEach(btn=>{
-
-
-btn.onclick=function(){
-
-
-
-let id =
-this.dataset.agent;
-
-
-
-iframe.src =
-agents[id].url;
-
-
-
+document.getElementById("backBtn").onclick = function(){
+  chatView.style.display = "none";
+  homeView.style.display = "flex";
+  tip.innerHTML = agents[currentAgent].tip;
+  window.scrollTo(0,0);
 };
 
-
-
-
+document.querySelectorAll(".enter-agent").forEach(function(btn){
+  btn.onclick = function(){
+    var id = parseInt(this.dataset.agent);
+    if(id === 3 && currentTrack !== "comp") switchTrack("comp", true);
+    if(id !== 3 && currentTrack !== "course") switchTrack("course", true);
+    openChat(id);
+  };
 });
 
-
-
-
-
-
-
-
-
-/* ==================================
-   TRACK SWITCH
-================================== */
-
-
-const btnCourse =
-document.getElementById(
-"btnCourse"
-);
-
-
-
-const btnComp =
-document.getElementById(
-"btnComp"
-);
-
-
-
-
-
-btnCourse.onclick=function(){
-
-
-btnCourse.classList.add(
-"active"
-);
-
-
-btnComp.classList.remove(
-"active"
-);
-
-
-
-iframe.src =
-agents[0].url;
-
-
-
-};
-
-
-
-
-
-
-
-btnComp.onclick=function(){
-
-
-btnComp.classList.add(
-"active"
-);
-
-
-btnCourse.classList.remove(
-"active"
-);
-
-
-
-iframe.src =
-agents[3].url;
-
-
-
-};
-
-
-
-
-
-
-
-
-/* ==================================
-   CONNECT EFFECT
-================================== */
-
-
-document
-.querySelectorAll(".card")
-.forEach(card=>{
-
-
-card.addEventListener(
-"mouseenter",
-()=>{
-
-
-card.style.transform=
-"translateY(-8px)";
-
-
-
-card.style.boxShadow=
-"0 0 40px rgba(80,200,255,.35)";
-
-
-
+/* ===== 赛道切换 ===== */
+var btnCourse = document.getElementById("btnCourse");
+var btnComp = document.getElementById("btnComp");
+var agentCount = document.getElementById("agentCount");
+var dataBtn = document.getElementById("dataBtn");
+
+function switchTrack(track, silent){
+  currentTrack = track;
+  var isCourse = (track === "course");
+  btnCourse.className = "track-btn" + (isCourse ? " active-course" : "");
+  btnComp.className = "track-btn" + (isCourse ? "" : " active-comp");
+  cards.forEach(function(c){
+    var t = c.dataset.track;
+    c.classList.toggle("dim", isCourse ? (t !== "course") : (t !== "comp"));
+  });
+  agentCount.textContent = isCourse ? "3 Course Agents Connected" : "1 Competition Agent Connected";
+  dataBtn.style.display = isCourse ? "" : "none";
+  pipeline.className = isCourse ? "pipeline" : "pipeline comp";
+  plTitle.textContent = isCourse ? "课内数据流 · REAL PIPELINE" : "竞赛数据流 · REAL PIPELINE";
+  plSteps.innerHTML = isCourse ? COURSE_STEPS : COMP_STEPS;
+  if(!silent){
+    var id = isCourse ? 0 : 3;
+    tip.innerHTML = agents[id].tip;
+    // 如果正在对话视图，跟着切
+    if(chatView.style.display === "flex") openChat(id);
+  }
 }
-);
+btnCourse.onclick = function(){ switchTrack("course"); };
+btnComp.onclick = function(){ switchTrack("comp"); };
 
-
-
-card.addEventListener(
-"mouseleave",
-()=>{
-
-
-card.style.transform="";
-
-card.style.boxShadow="";
-
-
-}
-);
-
-
-
-});
-
-
-
-
+/* ===== 侧栏功能 ===== */
+document.getElementById("sideComp").onclick = function(){ switchTrack("comp"); window.scrollTo(0,0); };
+document.getElementById("sideAbout").onclick = function(){
+  if(chatView.style.display === "flex"){
+    chatView.style.display = "none";
+    homeView.style.display = "flex";
+  }
+  var box = document.getElementById("aboutBox");
+  box.style.display = (box.style.display === "none") ? "" : "none";
+  if(box.style.display !== "none") box.scrollIntoView({behavior:"smooth"});
+};
 </script>
 
-
 </body>
-
 </html>
