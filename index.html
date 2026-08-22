@@ -3,211 +3,495 @@
 
 <head>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
 
-<title>学研智脑 — Multi-Agent Learning OS</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+
+<title>
+学研智脑 | Multi-Agent Learning OS
+</title>
+
 
 <style>
 
-/* =========================
-   基础
-========================= */
+
+/* ===========================
+   GLOBAL
+=========================== */
+
 
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+
+margin:0;
+
+padding:0;
+
+box-sizing:border-box;
+
 }
+
+
 
 body{
 
-    font-family:
-    "Microsoft YaHei",
-    "PingFang SC",
-    sans-serif;
 
-    background:#020711;
+background:#020611;
 
-    color:#e8f4ff;
 
-    min-height:100vh;
+font-family:
 
-    overflow-x:hidden;
+"Microsoft YaHei",
+"PingFang SC",
+Arial,
+sans-serif;
+
+
+color:white;
+
+
+overflow:hidden;
+
+
 }
 
 
 
-/* =========================
-   Multi Agent 启动界面
-========================= */
+
+/* ===========================
+   INTRO SYSTEM
+=========================== */
 
 
 #intro{
 
-    position:fixed;
 
-    inset:0;
-
-    z-index:9999;
-
-    background:
-    radial-gradient(
-        circle at center,
-        #102c46 0%,
-        #040a14 45%,
-        #010308 100%
-    );
+position:fixed;
 
 
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    overflow:hidden;
+inset:0;
 
 
-    transition:
-    opacity 1s ease,
-    visibility 1s;
+z-index:9999;
+
+
+background:
+
+
+radial-gradient(
+circle at center,
+#102a45,
+#030712 65%
+);
+
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+align-items:center;
+
+
+transition:
+
+opacity 1s ease;
+
+
 
 }
+
+
 
 
 
 #intro.hide{
 
-    opacity:0;
 
-    visibility:hidden;
-
-}
+opacity:0;
 
 
-
-/* 星空粒子 */
-
-#introCanvas{
-
-    position:absolute;
-
-    inset:0;
-
-}
-
-
-
-/* HUD扫描线 */
-
-.scan-line{
-
-    position:absolute;
-
-    inset:0;
-
-
-    background:
-    repeating-linear-gradient(
-        0deg,
-        transparent 0px,
-        transparent 4px,
-        rgba(100,200,255,.035) 5px
-    );
-
-    pointer-events:none;
-
-}
-
-
-
-/* 中央区域 */
-
-.agent-core{
-
-
-    position:relative;
-
-    width:520px;
-
-    height:520px;
-
-
-}
-
-
-/* 中央核心 */
-
-.core-node{
-
-
-    position:absolute;
-
-
-    left:50%;
-
-    top:50%;
-
-
-    transform:
-    translate(-50%,-50%);
-
-
-    width:130px;
-
-    height:130px;
-
-
-    border-radius:50%;
-
-
-    background:
-
-    radial-gradient(
-        circle,
-        #ffffff 0%,
-        #8ddcff 15%,
-        #168bd1 45%,
-        #05233c 80%
-    );
-
-
-    box-shadow:
-
-
-    0 0 40px #4cc9ff,
-
-    0 0 120px rgba(70,190,255,.7);
-
-
-    animation:
-
-    corePulse 2s infinite;
+pointer-events:none;
 
 
 }
 
 
 
-@keyframes corePulse{
 
 
-0%,100%{
+/* 星空Canvas */
+
+
+#space{
+
+
+position:absolute;
+
+
+inset:0;
+
+
+}
+
+
+
+
+/* HUD扫描 */
+
+
+.hud{
+
+
+position:absolute;
+
+
+inset:30px;
+
+
+border:
+
+1px solid rgba(80,200,255,.15);
+
+
+
+}
+
+
+
+.hud:before{
+
+
+content:"";
+
+
+position:absolute;
+
+
+left:0;
+
+
+top:0;
+
+
+width:100%;
+
+
+height:2px;
+
+
+background:
+
+linear-gradient(
+90deg,
+transparent,
+#42d9ff,
+transparent
+);
+
+
+animation:
+
+scan 4s linear infinite;
+
+
+
+}
+
+
+
+@keyframes scan{
+
+
+from{
+
+transform:translateY(0);
+
+}
+
+
+to{
+
+transform:translateY(100vh);
+
+}
+
+
+}
+
+
+
+
+/* ===========================
+   TITLE
+=========================== */
+
+
+.system-title{
+
+
+position:absolute;
+
+
+top:80px;
+
+
+text-align:center;
+
+
+width:100%;
+
+
+}
+
+
+
+.system-title h1{
+
+
+font-size:52px;
+
+
+letter-spacing:18px;
+
+
+font-weight:900;
+
+
+background:
+
+linear-gradient(
+90deg,
+#ffffff,
+#62d8ff,
+#b58cff
+);
+
+
+-webkit-background-clip:text;
+
+
+color:transparent;
+
+
+
+text-shadow:
+
+0 0 40px rgba(80,200,255,.7);
+
+
+
+}
+
+
+
+
+.system-title p{
+
+
+margin-top:15px;
+
+
+font-size:16px;
+
+
+letter-spacing:8px;
+
+
+color:#8db6d8;
+
+
+}
+
+
+
+
+
+/* ===========================
+   CORE
+=========================== */
+
+
+.core-area{
+
+
+position:relative;
+
+
+width:800px;
+
+
+height:500px;
+
+
+}
+
+
+
+
+
+.core{
+
+
+position:absolute;
+
+
+left:50%;
+
+
+top:50%;
+
 
 transform:
-translate(-50%,-50%)
-scale(1);
+
+translate(-50%,-50%);
+
+
+width:180px;
+
+
+height:180px;
 
 
 }
 
 
-50%{
+
+.hex{
+
+
+position:absolute;
+
+
+inset:0;
+
+
+clip-path:
+
+polygon(
+50% 0%,
+93% 25%,
+93% 75%,
+50% 100%,
+7% 75%,
+7% 25%
+);
+
+
+
+background:
+
+linear-gradient(
+135deg,
+#48d8ff,
+#154d88
+);
+
+
+
+box-shadow:
+
+0 0 80px #2dcaff;
+
+
+
+animation:
+
+rotateCore 8s linear infinite;
+
+
+
+}
+
+
+
+.hex-inner{
+
+
+position:absolute;
+
+
+inset:15px;
+
+
+
+clip-path:
+
+polygon(
+50% 0%,
+93% 25%,
+93% 75%,
+50% 100%,
+7% 75%,
+7% 25%
+);
+
+
+
+background:#06192d;
+
+
+
+display:flex;
+
+
+align-items:center;
+
+
+justify-content:center;
+
+
+flex-direction:column;
+
+
+
+}
+
+
+
+.hex-inner b{
+
+
+font-size:22px;
+
+
+letter-spacing:3px;
+
+
+color:#7fe8ff;
+
+
+}
+
+
+
+.hex-inner span{
+
+
+font-size:12px;
+
+
+color:#8aa9c5;
+
+
+margin-top:8px;
+
+
+}
+
+
+
+@keyframes rotateCore{
+
+
+to{
+
 
 transform:
-translate(-50%,-50%)
-scale(1.15);
+
+rotate(360deg);
 
 
 }
@@ -218,7 +502,12 @@ scale(1.15);
 
 
 
-/* Agent节点 */
+
+/* ===========================
+   AGENT CARD
+=========================== */
+
+
 
 .agent{
 
@@ -226,57 +515,60 @@ scale(1.15);
 position:absolute;
 
 
-width:110px;
+width:170px;
+
 
 height:110px;
 
 
-border-radius:50%;
-
-
-display:flex;
-
-flex-direction:column;
-
-justify-content:center;
-
-align-items:center;
-
-
-font-size:13px;
-
-
 background:
-rgba(10,35,60,.8);
+
+
+linear-gradient(
+135deg,
+rgba(20,50,80,.85),
+rgba(5,15,30,.8)
+);
+
 
 
 border:
 
-1px solid rgba(120,220,255,.6);
+
+1px solid rgba(80,200,255,.35);
+
+
+
+backdrop-filter:
+
+blur(10px);
+
+
+
+padding:18px;
+
+
+
+border-radius:12px;
 
 
 
 box-shadow:
 
-0 0 30px rgba(80,190,255,.5);
 
+0 0 30px rgba(40,180,255,.25);
 
-
-opacity:0;
-
-
-animation:
-agentAppear .8s forwards;
 
 
 }
 
 
 
-.agent span{
+.agent h3{
 
 
-font-size:26px;
+font-size:17px;
+
 
 margin-bottom:5px;
 
@@ -288,40 +580,23 @@ margin-bottom:5px;
 .agent small{
 
 
+color:#83cfff;
+
+
+}
+
+
+
+.agent .status{
+
+
+margin-top:12px;
+
+
 font-size:11px;
 
-color:#9fdcff;
 
-
-}
-
-
-
-@keyframes agentAppear{
-
-
-from{
-
-
-opacity:0;
-
-transform:
-scale(.2);
-
-
-}
-
-
-to{
-
-
-opacity:1;
-
-transform:
-scale(1);
-
-
-}
+color:#52ff9a;
 
 
 }
@@ -329,63 +604,67 @@ scale(1);
 
 
 
-/* 四个智能体位置 */
+/* 四个Agent位置 */
 
 
-.agent.a1{
+.agent1{
 
 
-top:30px;
-
-left:205px;
+left:0;
 
 
-animation-delay:1s;
+top:70px;
 
 
-}
-
-
-
-.agent.a2{
-
-
-left:20px;
-
-top:210px;
-
-
-animation-delay:1.5s;
+border-color:#42cfff;
 
 
 }
 
 
 
-.agent.a3{
+.agent2{
 
 
-right:20px;
-
-top:210px;
+right:0;
 
 
-animation-delay:2s;
+top:70px;
+
+
+border-color:#ff9a52;
 
 
 }
 
 
 
-.agent.a4{
+.agent3{
 
 
-bottom:30px;
-
-left:205px;
+left:0;
 
 
-animation-delay:2.5s;
+bottom:70px;
+
+
+border-color:#a97cff;
+
+
+}
+
+
+
+.agent4{
+
+
+right:0;
+
+
+bottom:70px;
+
+
+border-color:#62ff9d;
 
 
 }
@@ -394,10 +673,13 @@ animation-delay:2.5s;
 
 
 
-/* 数据连接线 */
+
+/* ===========================
+   CONNECT LINE
+=========================== */
 
 
-.link{
+.line{
 
 
 position:absolute;
@@ -407,22 +689,23 @@ height:1px;
 
 
 background:
+
 linear-gradient(
 90deg,
 transparent,
-#53caff,
+#46d8ff,
 transparent
 );
 
-
-transform-origin:left;
 
 
 opacity:.5;
 
 
 animation:
+
 flow 2s infinite;
+
 
 
 }
@@ -432,24 +715,9 @@ flow 2s infinite;
 @keyframes flow{
 
 
-from{
-
-filter:
-brightness(.5);
-
-}
-
 50%{
 
-filter:
-brightness(2);
-
-}
-
-to{
-
-filter:
-brightness(.5);
+opacity:1;
 
 }
 
@@ -459,73 +727,65 @@ brightness(.5);
 
 
 
-.link1{
+.l1{
 
 
-width:160px;
+width:220px;
 
 
-left:260px;
-
-top:205px;
+left:170px;
 
 
-transform:
-rotate(-90deg);
+top:160px;
 
 
 }
 
 
-.link2{
+
+.l2{
 
 
-width:160px;
+width:220px;
 
 
-left:110px;
-
-top:260px;
+right:170px;
 
 
-transform:
-rotate(0deg);
-
-
-}
-
-
-.link3{
-
-
-width:160px;
-
-
-left:260px;
-
-top:260px;
-
-
-transform:
-rotate(0deg);
+top:160px;
 
 
 }
 
 
-.link4{
 
 
-width:160px;
+.l3{
 
 
-left:260px;
-
-top:330px;
+width:220px;
 
 
-transform:
-rotate(90deg);
+left:170px;
+
+
+bottom:160px;
+
+
+}
+
+
+
+.l4{
+
+
+width:220px;
+
+
+right:170px;
+
+
+bottom:160px;
 
 
 }
@@ -534,15 +794,18 @@ rotate(90deg);
 
 
 
-/* 标题 */
+/* ===========================
+   SYSTEM STATUS
+=========================== */
 
-.core-title{
+
+.status-panel{
 
 
 position:absolute;
 
 
-top:410px;
+bottom:70px;
 
 
 width:100%;
@@ -552,89 +815,80 @@ text-align:center;
 
 
 
-opacity:0;
+font-family:
+
+Consolas,
+monospace;
 
 
-animation:
-titleIn 1s forwards;
 
-
-animation-delay:3.2s;
-
+color:#82cfff;
 
 
 }
 
 
 
-.core-title h1{
+
+.progress{
 
 
-font-size:32px;
+width:360px;
 
 
-letter-spacing:8px;
+height:5px;
+
+
+margin:15px auto;
+
+
+background:#12263d;
+
+
+overflow:hidden;
+
+
+}
+
+
+
+.progress span{
+
+
+display:block;
+
+
+height:100%;
+
+
+width:0;
 
 
 background:
 
 linear-gradient(
 90deg,
-#fff,
-#6fd6ff,
-#ffb36b
+#36d8ff,
+#b58cff
 );
 
 
--webkit-background-clip:text;
 
-color:transparent;
+animation:
 
-
-}
-
-
-
-.core-title p{
-
-
-margin-top:12px;
-
-
-font-size:14px;
-
-
-color:#86a8c5;
-
-
-letter-spacing:3px;
+load 4s forwards;
 
 
 }
 
 
 
+@keyframes load{
 
-
-@keyframes titleIn{
-
-
-from{
-
-opacity:0;
-
-transform:
-translateY(20px);
-
-
-}
 
 to{
 
-opacity:1;
-
-transform:none;
-
+width:100%;
 
 }
 
@@ -642,9 +896,6 @@ transform:none;
 }
 
 
-
-
-/* 跳过 */
 
 #skip{
 
@@ -652,15 +903,15 @@ transform:none;
 position:absolute;
 
 
-bottom:35px;
-
-
 right:40px;
+
+
+bottom:35px;
 
 
 padding:
 
-8px 25px;
+10px 28px;
 
 
 border-radius:30px;
@@ -671,135 +922,61 @@ background:
 rgba(255,255,255,.05);
 
 
+
 border:
 
-1px solid rgba(255,255,255,.2);
+1px solid rgba(255,255,255,.3);
 
 
-color:#9ecfff;
+
+color:white;
 
 
 cursor:pointer;
 
 
-z-index:5;
-
-
 }
 
-
-
-#skip:hover{
-
-
-background:
-rgba(100,200,255,.15);
-
-
-}
-
-
-
-/* =========================
-   后续主体代码 Part2
-========================= */
 
 
 </style>
-
-</head>
-
-
-<body>
-
-
-
 <!-- =========================
-     Multi-Agent启动动画
+     MAIN SYSTEM
 ========================= -->
 
 
-<div id="intro">
-
-
-<canvas id="introCanvas"></canvas>
-
-
-<div class="scan-line"></div>
+<div class="system-bg"></div>
 
 
 
-<div class="agent-core">
+<div id="app">
 
 
 
-<div class="link link1"></div>
-<div class="link link2"></div>
-<div class="link link3"></div>
-<div class="link link4"></div>
+<!-- 顶部导航 -->
+
+<header class="topbar">
 
 
 
-<div class="core-node"></div>
+<div class="brand">
 
 
+<div class="logo-core">
 
-
-<div class="agent a1">
-
-<span>🔍</span>
-
-错题诊疗
-
-<small>Diagnosis Agent</small>
+◇
 
 </div>
 
 
 
-<div class="agent a2">
-
-<span>⚔️</span>
-
-学习教官
-
-<small>Coach Agent</small>
-
-</div>
+<div>
 
 
-
-
-<div class="agent a3">
-
-<span>📊</span>
-
-学情分析
-
-<small>Insight Agent</small>
-
-</div>
-
-
-
-<div class="agent a4">
-
-<span>🏆</span>
-
-竞赛分析
-
-<small>Competition Agent</small>
-
-</div>
-
-
-
-
-<div class="core-title">
-
-<h1>
+<h2>
 学研智脑
-</h1>
+</h2>
+
 
 <p>
 MULTI-AGENT LEARNING OS
@@ -814,711 +991,6 @@ MULTI-AGENT LEARNING OS
 
 
 
-<button id="skip">
-SKIP →
-</button>
-
-
-
-</div>
-<style>
-
-/* =========================
-   主系统背景
-========================= */
-
-
-.system-bg{
-
-position:fixed;
-
-inset:0;
-
-z-index:-2;
-
-
-background:
-
-linear-gradient(
-135deg,
-#020711,
-#092038,
-#06111e
-);
-
-
-overflow:hidden;
-
-
-}
-
-
-
-.system-bg::before{
-
-
-content:"";
-
-position:absolute;
-
-inset:0;
-
-
-background-image:
-
-linear-gradient(
-rgba(80,180,255,.08) 1px,
-transparent 1px
-),
-
-linear-gradient(
-90deg,
-rgba(80,180,255,.08) 1px,
-transparent 1px
-);
-
-
-background-size:
-
-60px 60px;
-
-
-animation:
-
-gridMove 12s linear infinite;
-
-
-opacity:.3;
-
-
-}
-
-
-
-@keyframes gridMove{
-
-
-from{
-
-transform:
-translateY(0);
-
-}
-
-to{
-
-transform:
-translateY(60px);
-
-}
-
-
-}
-
-
-
-
-
-/* =========================
-   APP主体
-========================= */
-
-
-#app{
-
-
-opacity:0;
-
-
-transition:
-
-opacity 1s;
-
-
-min-height:100vh;
-
-
-display:flex;
-
-flex-direction:column;
-
-
-}
-
-
-
-#app.show{
-
-opacity:1;
-
-}
-
-
-
-
-
-/* =========================
-   顶部控制台
-========================= */
-
-
-header{
-
-
-height:76px;
-
-
-display:flex;
-
-
-align-items:center;
-
-
-justify-content:space-between;
-
-
-padding:
-
-0 30px;
-
-
-
-background:
-
-rgba(5,15,28,.75);
-
-
-
-border-bottom:
-
-1px solid rgba(100,200,255,.15);
-
-
-
-backdrop-filter:
-
-blur(20px);
-
-
-}
-
-
-
-
-
-.logo{
-
-
-font-size:24px;
-
-
-font-weight:900;
-
-
-letter-spacing:3px;
-
-
-background:
-
-linear-gradient(
-90deg,
-#fff,
-#55cfff,
-#ffb36b
-);
-
-
--webkit-background-clip:text;
-
-
-color:transparent;
-
-
-}
-
-
-
-.logo small{
-
-
-display:block;
-
-
-font-size:12px;
-
-
-font-weight:400;
-
-
-letter-spacing:1px;
-
-
-margin-top:5px;
-
-
-color:#7e9ab5;
-
-
-}
-
-
-
-
-
-/* 双赛道 */
-
-
-.track{
-
-
-display:flex;
-
-
-gap:10px;
-
-
-background:
-
-rgba(255,255,255,.05);
-
-
-padding:5px;
-
-
-border-radius:30px;
-
-
-}
-
-
-
-
-.track-btn{
-
-
-padding:
-
-10px 26px;
-
-
-border-radius:30px;
-
-
-border:none;
-
-
-cursor:pointer;
-
-
-color:#9bb6cc;
-
-
-background:transparent;
-
-
-font-size:15px;
-
-
-font-weight:bold;
-
-
-transition:.3s;
-
-
-}
-
-
-
-.track-btn.active-course{
-
-
-background:
-
-linear-gradient(
-90deg,
-#168bd1,
-#53d0ff
-);
-
-
-color:white;
-
-
-box-shadow:
-
-0 0 25px rgba(50,200,255,.6);
-
-
-}
-
-
-
-
-.track-btn.active-comp{
-
-
-background:
-
-linear-gradient(
-90deg,
-#ff8c42,
-#ff4d4d
-);
-
-
-color:white;
-
-
-box-shadow:
-
-0 0 25px rgba(255,120,70,.6);
-
-
-}
-
-
-
-
-
-/* Agent按钮 */
-
-
-.tabs{
-
-
-display:flex;
-
-
-gap:8px;
-
-
-}
-
-
-
-.tab{
-
-
-padding:
-
-8px 18px;
-
-
-border-radius:20px;
-
-
-border:
-
-1px solid rgba(120,200,255,.25);
-
-
-
-background:
-
-rgba(255,255,255,.04);
-
-
-
-color:#b6d2e8;
-
-
-cursor:pointer;
-
-
-transition:.3s;
-
-
-}
-
-
-
-.tab.active{
-
-
-background:
-
-linear-gradient(
-90deg,
-#168bd1,
-#4ecbff
-);
-
-
-color:white;
-
-
-}
-
-
-
-
-
-.data-btn{
-
-
-padding:
-
-9px 18px;
-
-
-border-radius:20px;
-
-
-border:
-
-1px solid rgba(255,180,100,.4);
-
-
-color:#ffbd88;
-
-
-text-decoration:none;
-
-
-}
-
-
-
-
-
-/* =========================
-   提示区域
-========================= */
-
-
-.agent-tip{
-
-
-text-align:center;
-
-
-padding:
-
-12px;
-
-
-background:
-
-rgba(0,0,0,.35);
-
-
-color:#9bb6cc;
-
-
-font-size:14px;
-
-
-border-bottom:
-
-1px solid rgba(255,255,255,.08);
-
-
-}
-
-
-.agent-tip b{
-
-color:#ffb36b;
-
-}
-
-
-
-
-
-/* =========================
-   iframe区域
-========================= */
-
-
-main{
-
-
-flex:1;
-
-
-padding:
-
-20px;
-
-
-display:flex;
-
-
-}
-
-
-
-.frame-wrap{
-
-
-width:100%;
-
-
-max-width:1200px;
-
-
-margin:auto;
-
-
-height:
-
-calc(100vh - 190px);
-
-
-
-background:white;
-
-
-border-radius:20px;
-
-
-overflow:hidden;
-
-
-
-box-shadow:
-
-0 0 60px rgba(50,180,255,.25);
-
-
-
-}
-
-
-
-iframe{
-
-
-width:100%;
-
-
-height:100%;
-
-
-border:none;
-
-
-}
-
-
-
-
-
-
-
-/* =========================
-   关于系统
-========================= */
-
-
-details{
-
-
-margin:
-
-0 auto 20px;
-
-
-width:
-
-calc(100% - 40px);
-
-
-max-width:1200px;
-
-
-
-background:
-
-rgba(5,15,30,.8);
-
-
-
-border:
-
-1px solid rgba(120,200,255,.15);
-
-
-padding:
-
-15px 20px;
-
-
-border-radius:15px;
-
-
-color:#aac4da;
-
-
-}
-
-
-
-summary{
-
-
-cursor:pointer;
-
-
-color:#6fd6ff;
-
-
-}
-
-
-
-.inner{
-
-
-padding-top:15px;
-
-
-font-size:14px;
-
-
-line-height:1.8;
-
-
-}
-
-
-</style>
-
-
-
-
-
-<!-- =========================
-     主系统
-========================= -->
-
-
-<div class="system-bg"></div>
-
-
-
-<div id="app">
-
-
-
-<header>
-
-
-
-<div class="logo">
-
-
-学研智脑
-
-
-<small>
-多智能体协作学习平台 · Multi-Agent Education OS
-</small>
-
-
-</div>
-
 
 
 
@@ -1526,23 +998,26 @@ line-height:1.8;
 
 
 <button 
-class="track-btn active-course"
-id="btnCourse">
+id="btnCourse"
+class="track-btn active">
+
 
 📖 课内微积分
 
+
 </button>
 
 
 
-<button 
-class="track-btn"
-id="btnComp">
+<button
+id="btnComp"
+class="track-btn">
+
 
 🏆 课外竞赛
 
-</button>
 
+</button>
 
 
 </div>
@@ -1551,56 +1026,17 @@ id="btnComp">
 
 
 
-<div class="tabs" id="courseTabs">
+
+<div class="system-state">
 
 
-<button 
-class="tab active"
-data-src="https://udify.app/chatbot/zPNLhszEZfxDXrHD"
-data-tip="🔍 错题诊疗师：识别错误类型，分析知识漏洞，并自动建立个人错题画像">
-
-错题诊疗师
-
-</button>
+<span></span>
 
 
-
-<button 
-class="tab"
-data-src="https://udify.app/chatbot/MLPSYJvA2xRcuQxv"
-data-tip="⚔️ 错题教官：通过找茬训练和陷阱题生成强化薄弱能力">
-
-错题教官
-
-</button>
-
-
-
-<button 
-class="tab"
-data-src="https://udify.app/chatbot/qVngF5df6eA6DKuP"
-data-tip="📊 学情分析师：基于错题数据生成学习画像">
-
-学情分析师
-
-</button>
-
+SYSTEM ONLINE
 
 
 </div>
-
-
-
-
-
-<a 
-class="data-btn"
-id="dataBtn"
-href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh">
-
-📒 实时错题数据
-
-</a>
 
 
 
@@ -1610,9 +1046,133 @@ href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh">
 
 
 
-<div class="agent-tip" id="tip">
 
-🔍 错题诊疗师：识别错误类型，分析知识漏洞，并自动建立个人错题画像
+<!-- 主区域 -->
+
+
+<div class="workspace">
+
+
+
+<!-- 左侧 -->
+
+
+<aside class="sidebar">
+
+
+
+<h3>
+AGENT CENTER
+</h3>
+
+
+
+
+<div class="side-item active">
+
+◉ 智能体中心
+
+</div>
+
+
+
+<div class="side-item">
+
+◌ 学习数据
+
+</div>
+
+
+
+<div class="side-item">
+
+◌ 错题知识库
+
+</div>
+
+
+
+<div class="side-item">
+
+◌ 学习画像
+
+</div>
+
+
+
+<div class="side-item">
+
+◌ 竞赛分析
+
+</div>
+
+
+
+
+
+<div class="profile">
+
+
+<div class="avatar">
+
+AI
+
+</div>
+
+
+<div>
+
+
+<b>
+Student
+</b>
+
+
+<p>
+Learning Level Lv.17
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+</aside>
+
+
+
+
+
+
+
+
+
+<!-- 中间 -->
+
+
+<section class="main-panel">
+
+
+
+<div class="agent-header">
+
+
+<h2>
+
+当前智能体网络
+
+</h2>
+
+
+<span>
+
+4 Agents Connected
+
+</span>
+
 
 
 </div>
@@ -1622,10 +1182,191 @@ href="https://pcnhdqc74b83.feishu.cn/base/NyCsbIOsQalRRlsL0ewcUicQnCh">
 
 
 
-<main>
+<div class="agent-cards">
 
 
-<div class="frame-wrap">
+
+<div class="card blue">
+
+
+<div class="icon">
+
+🔍
+
+</div>
+
+
+<h3>
+错题诊疗师
+</h3>
+
+
+<p>
+Diagnosis Agent
+</p>
+
+
+<button
+class="enter-agent"
+data-agent="0">
+
+进入对话 →
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card orange">
+
+
+<div class="icon">
+
+⚔️
+
+</div>
+
+
+<h3>
+错题教官
+</h3>
+
+
+<p>
+Coach Agent
+</p>
+
+
+<button
+class="enter-agent"
+data-agent="1">
+
+进入对话 →
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="card purple">
+
+
+<div class="icon">
+
+📊
+
+</div>
+
+
+<h3>
+学情分析师
+</h3>
+
+
+<p>
+Insight Agent
+</p>
+
+
+<button
+class="enter-agent"
+data-agent="2">
+
+进入对话 →
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="card green">
+
+
+<div class="icon">
+
+🏆
+
+</div>
+
+
+<h3>
+竞赛分析师
+</h3>
+
+
+<p>
+Competition Agent
+</p>
+
+
+<button
+class="enter-agent"
+data-agent="3">
+
+进入对话 →
+
+</button>
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- iframe -->
+
+
+<div class="ai-window">
+
+
+<div class="window-head">
+
+
+<span>
+AI WORKSPACE
+</span>
+
+
+<div>
+
+● ● ●
+
+</div>
+
+
+</div>
+
+
 
 
 <iframe
@@ -1643,250 +1384,741 @@ allow="microphone;clipboard-write">
 </div>
 
 
-</main>
+
+
+</section>
 
 
 
 
 
-<details>
-
-
-<summary>
-
-关于学研智脑
-
-</summary>
-
-
-
-<div class="inner">
-
-
-<p>
-
-<b>核心理念：</b>
-
-不是单一AI问答，而是多个专业Agent围绕学习数据持续协同。
-
-</p>
-
-
-<p>
-
-<b>课内闭环：</b>
-
-错题诊疗 → 错因识别 → 教官训练 → 学情分析 → 个性化学习。
-
-</p>
-
-
-
-<p>
-
-<b>竞赛模式：</b>
-
-数据分析Agent负责数据计算，AI负责解释与可视化生成。
-
-</p>
-
-
-
-<p>
-
-<b>技术架构：</b>
-
-Dify Agent工作流 + 知识库 + 飞书数据底座 + Python计算分析。
-
-</p>
 
 
 </div>
 
 
-</details>
 
 
 
 </div>
-<script>
+
+
+
+
+
+<style>
 
 
 /* =========================
-   Agent切换系统
+   DASHBOARD STYLE
 ========================= */
 
 
-const tabs =
-document.querySelectorAll(".tab");
+.system-bg{
 
 
-const frame =
-document.getElementById("agentFrame");
+position:fixed;
 
 
-const tip =
-document.getElementById("tip");
+inset:0;
 
 
-
-tabs.forEach(tab=>{
-
-
-tab.onclick=function(){
+z-index:-2;
 
 
-tabs.forEach(t=>
+background:
 
-t.classList.remove("active")
-
+linear-gradient(
+135deg,
+#020611,
+#081a2d
 );
 
 
-tab.classList.add("active");
+}
 
 
 
-frame.src =
-tab.dataset.src;
+#app{
 
 
+display:flex;
 
-tip.innerHTML =
-tab.dataset.tip;
 
+flex-direction:column;
 
-};
 
+height:100vh;
 
-});
 
+opacity:0;
 
 
+transition:1s;
 
 
+}
 
 
-/* =========================
-   赛道切换
-========================= */
 
+#app.show{
 
-const btnCourse =
-document.getElementById("btnCourse");
 
+opacity:1;
 
-const btnComp =
-document.getElementById("btnComp");
 
+}
 
-const courseTabs =
-document.getElementById("courseTabs");
 
 
-const dataBtn =
-document.getElementById("dataBtn");
 
+.topbar{
 
 
-const COMP_SRC =
+height:75px;
 
-"https://udify.app/chatbot/xD2yYF586oTgpGYc";
 
+display:flex;
 
 
-const COMP_TIP =
+align-items:center;
 
-"🏆 竞赛数据分析师：上传Excel/CSV数据，由代码完成统计计算，AI生成分析报告和可视化结果。";
 
+justify-content:space-between;
 
 
+padding:
 
+0 30px;
 
-btnCourse.onclick=function(){
 
+background:
 
-btnCourse.className =
-"track-btn active-course";
+rgba(3,12,25,.75);
 
 
-btnComp.className =
-"track-btn";
 
+border-bottom:
 
-courseTabs.style.display="flex";
+1px solid rgba(80,200,255,.2);
 
 
-dataBtn.style.display="block";
+backdrop-filter:
 
+blur(15px);
 
 
-let current =
-document.querySelector(".tab.active");
 
+}
 
-if(!current)
 
-current=tabs[0];
 
 
+.brand{
 
-frame.src =
-current.dataset.src;
 
+display:flex;
 
 
-tip.innerHTML =
-current.dataset.tip;
+align-items:center;
 
 
+gap:15px;
 
-};
 
+}
 
 
 
 
-btnComp.onclick=function(){
+.logo-core{
 
 
-btnComp.className =
-"track-btn active-comp";
+width:45px;
 
 
-btnCourse.className =
-"track-btn";
+height:45px;
 
 
+border-radius:12px;
 
-courseTabs.style.display="none";
 
+display:flex;
 
-dataBtn.style.display="none";
 
+align-items:center;
 
 
-frame.src =
-COMP_SRC;
+justify-content:center;
 
 
-tip.innerHTML =
-COMP_TIP;
+background:
 
+linear-gradient(
+135deg,
+#45d7ff,
+#755cff
+);
 
 
-};
+box-shadow:
 
+0 0 25px #45d7ff;
 
 
+}
 
 
 
+.brand h2{
 
 
-/* =========================
-   启动动画控制
-========================= */
+font-size:24px;
+
+
+letter-spacing:5px;
+
+
+}
+
+
+
+.brand p{
+
+
+font-size:10px;
+
+
+color:#7fa8c9;
+
+
+letter-spacing:3px;
+
+
+}
+
+
+
+
+
+
+
+.track{
+
+
+display:flex;
+
+
+gap:10px;
+
+
+}
+
+
+
+.track-btn{
+
+
+padding:
+
+10px 30px;
+
+
+border-radius:25px;
+
+
+border:
+
+1px solid rgba(120,200,255,.3);
+
+
+background:
+
+rgba(255,255,255,.05);
+
+
+color:white;
+
+
+cursor:pointer;
+
+
+}
+
+
+
+.track-btn.active{
+
+
+background:
+
+linear-gradient(
+90deg,
+#178bd1,
+#43d6ff
+);
+
+
+
+}
+
+
+
+
+
+.system-state{
+
+
+font-family:
+
+Consolas;
+
+
+font-size:13px;
+
+
+color:#55ff9b;
+
+
+}
+
+
+
+.system-state span{
+
+
+display:inline-block;
+
+
+width:8px;
+
+
+height:8px;
+
+
+border-radius:50%;
+
+
+background:#55ff9b;
+
+
+box-shadow:
+
+0 0 10px #55ff9b;
+
+
+}
+
+
+
+
+.workspace{
+
+
+display:flex;
+
+
+flex:1;
+
+
+padding:20px;
+
+
+gap:20px;
+
+
+}
+
+
+
+
+
+
+
+.sidebar{
+
+
+width:220px;
+
+
+background:
+
+rgba(5,20,38,.75);
+
+
+border:
+
+1px solid rgba(100,200,255,.15);
+
+
+border-radius:15px;
+
+
+padding:20px;
+
+
+
+}
+
+
+
+.sidebar h3{
+
+
+color:#7edbff;
+
+
+font-size:14px;
+
+
+margin-bottom:20px;
+
+
+}
+
+
+
+.side-item{
+
+
+padding:
+
+12px;
+
+
+margin-bottom:8px;
+
+
+border-radius:10px;
+
+
+color:#9cb8d0;
+
+
+}
+
+
+
+.side-item.active{
+
+
+background:
+
+rgba(50,180,255,.15);
+
+
+color:white;
+
+
+}
+
+
+
+.profile{
+
+
+margin-top:50px;
+
+
+display:flex;
+
+
+gap:10px;
+
+
+align-items:center;
+
+
+color:#9cc;
+
+
+}
+
+
+
+.avatar{
+
+
+width:45px;
+
+
+height:45px;
+
+
+border-radius:50%;
+
+
+background:
+
+linear-gradient(
+135deg,
+#36d8ff,
+#814dff
+);
+
+
+display:flex;
+
+
+align-items:center;
+
+
+justify-content:center;
+
+
+}
+
+
+
+
+.main-panel{
+
+
+flex:1;
+
+
+display:flex;
+
+
+flex-direction:column;
+
+
+gap:15px;
+
+
+}
+
+
+
+
+.agent-header{
+
+
+display:flex;
+
+
+justify-content:space-between;
+
+
+}
+
+
+
+.agent-header span{
+
+
+color:#55ff9b;
+
+
+}
+
+
+
+
+.agent-cards{
+
+
+display:grid;
+
+
+grid-template-columns:
+
+repeat(4,1fr);
+
+
+gap:15px;
+
+
+}
+
+
+
+.card{
+
+
+padding:
+
+20px;
+
+
+border-radius:15px;
+
+
+background:
+
+rgba(8,25,45,.8);
+
+
+border:
+
+1px solid rgba(255,255,255,.1);
+
+
+text-align:center;
+
+
+}
+
+
+
+.card .icon{
+
+
+font-size:35px;
+
+
+}
+
+
+
+
+.card p{
+
+
+color:#89abc5;
+
+
+font-size:12px;
+
+
+}
+
+
+
+.card button{
+
+
+margin-top:15px;
+
+
+padding:
+
+8px 20px;
+
+
+border-radius:20px;
+
+
+background:
+
+transparent;
+
+
+color:white;
+
+
+border:
+
+1px solid #55cfff;
+
+
+cursor:pointer;
+
+
+}
+
+
+
+.orange button{
+
+border-color:#ff9955;
+
+}
+
+
+.purple button{
+
+border-color:#b785ff;
+
+}
+
+
+.green button{
+
+border-color:#55ff9b;
+
+}
+
+
+
+
+
+
+
+.ai-window{
+
+
+flex:1;
+
+
+background:white;
+
+
+border-radius:15px;
+
+
+overflow:hidden;
+
+
+display:flex;
+
+
+flex-direction:column;
+
+
+}
+
+
+
+.window-head{
+
+
+height:40px;
+
+
+background:#061321;
+
+
+display:flex;
+
+
+justify-content:space-between;
+
+
+align-items:center;
+
+
+padding:0 20px;
+
+
+color:#7edbff;
+
+
+}
+
+
+
+
+.ai-window iframe{
+
+
+flex:1;
+
+
+border:none;
+
+
+}
+
+
+
+</style>
+<script>
+
+
+/* ==================================
+   INTRO -> SYSTEM
+================================== */
 
 
 const intro =
@@ -1898,20 +2130,19 @@ document.getElementById("app");
 
 
 
-let started=false;
+let entered=false;
 
 
 
 function enterSystem(){
 
 
-if(started)
-
+if(entered)
 return;
 
 
 
-started=true;
+entered=true;
 
 
 
@@ -1935,20 +2166,20 @@ app.classList.add("show");
 
 
 
+// 自动进入
+
 setTimeout(
-
 enterSystem,
-
 5200
-
 );
 
 
 
+// 跳过按钮
+
 document
 .getElementById("skip")
 .onclick=
-
 enterSystem;
 
 
@@ -1957,13 +2188,13 @@ enterSystem;
 
 
 
-/* =========================
-   开场神经粒子网络
-========================= */
+/* ==================================
+   SPACE PARTICLES
+================================== */
 
 
 const canvas =
-document.getElementById("introCanvas");
+document.getElementById("space");
 
 
 const ctx =
@@ -1971,11 +2202,11 @@ canvas.getContext("2d");
 
 
 
-let particles=[];
+let stars=[];
 
 
 
-function resizeCanvas(){
+function resize(){
 
 
 canvas.width =
@@ -1986,28 +2217,31 @@ canvas.height =
 window.innerHeight;
 
 
-
 }
 
 
 
-resizeCanvas();
+resize();
+
 
 
 window.addEventListener(
 "resize",
-resizeCanvas
+resize
 );
 
 
 
 
 
+for(
+let i=0;
+i<160;
+i++
+){
 
-for(let i=0;i<120;i++){
 
-
-particles.push({
+stars.push({
 
 
 x:
@@ -2018,16 +2252,12 @@ y:
 Math.random()*innerHeight,
 
 
-vx:
-(Math.random()-.5)*0.4,
+r:
+Math.random()*2+0.5,
 
 
-vy:
-(Math.random()-.5)*0.4,
-
-
-size:
-Math.random()*2+1
+speed:
+Math.random()*0.5+0.1
 
 
 
@@ -2042,7 +2272,7 @@ Math.random()*2+1
 
 
 
-function drawNetwork(){
+function animateStars(){
 
 
 ctx.clearRect(
@@ -2054,41 +2284,29 @@ canvas.height
 
 
 
+stars.forEach(s=>{
 
-particles.forEach(p=>{
 
-
-p.x+=p.vx;
-
-p.y+=p.vy;
+s.y+=s.speed;
 
 
 
 if(
-p.x<0 ||
-p.x>canvas.width
+s.y>canvas.height
 )
 
-p.vx*=-1;
-
-
-
-if(
-p.y<0 ||
-p.y>canvas.height
-)
-
-p.vy*=-1;
+s.y=0;
 
 
 
 ctx.beginPath();
 
 
+
 ctx.arc(
-p.x,
-p.y,
-p.size,
+s.x,
+s.y,
+s.r,
 0,
 Math.PI*2
 );
@@ -2096,66 +2314,159 @@ Math.PI*2
 
 
 ctx.fillStyle=
-"rgba(90,210,255,.7)";
+"rgba(100,210,255,.8)";
 
 
 ctx.fill();
 
 
 
-
-particles.forEach(q=>{
-
-
-let dx =
-p.x-q.x;
+});
 
 
-let dy =
-p.y-q.y;
 
-
-let dist =
-Math.sqrt(
-dx*dx+dy*dy
+requestAnimationFrame(
+animateStars
 );
-
-
-
-if(dist<130){
-
-
-ctx.beginPath();
-
-
-ctx.moveTo(
-p.x,
-p.y
-);
-
-
-ctx.lineTo(
-q.x,
-q.y
-);
-
-
-
-ctx.strokeStyle=
-
-"rgba(80,190,255,"+
-
-(0.15-dist/900)
-
-+")";
-
-
-
-ctx.stroke();
-
 
 
 }
+
+
+
+animateStars();
+
+
+
+
+
+
+
+
+/* ==================================
+   AGENT DATA
+================================== */
+
+
+
+const agents=[
+
+
+{
+
+url:
+
+"https://udify.app/chatbot/zPNLhszEZfxDXrHD",
+
+tip:
+
+"🔍 错题诊疗师：识别错因，建立个人错题知识画像。"
+
+},
+
+
+
+{
+
+
+url:
+
+"https://udify.app/chatbot/MLPSYJvA2xRcuQxv",
+
+
+tip:
+
+"⚔️ 错题教官：通过找茬训练和陷阱题强化能力。"
+
+
+},
+
+
+
+
+{
+
+
+url:
+
+"https://udify.app/chatbot/qVngF5df6eA6DKuP",
+
+
+tip:
+
+"📊 学情分析师：生成学习画像和薄弱点分析。"
+
+
+},
+
+
+
+
+{
+
+
+url:
+
+"https://udify.app/chatbot/xD2yYF586oTgpGYc",
+
+
+tip:
+
+"🏆 竞赛数据分析师：Excel数据分析与可视化生成。"
+
+
+}
+
+
+
+];
+
+
+
+
+
+
+
+
+const iframe =
+document.getElementById(
+"agentFrame"
+);
+
+
+
+
+
+
+const cards =
+document.querySelectorAll(
+".enter-agent"
+);
+
+
+
+
+
+
+cards.forEach(btn=>{
+
+
+btn.onclick=function(){
+
+
+
+let id =
+this.dataset.agent;
+
+
+
+iframe.src =
+agents[id].url;
+
+
+
+};
+
 
 
 
@@ -2163,19 +2474,134 @@ ctx.stroke();
 
 
 
-});
 
 
 
-requestAnimationFrame(drawNetwork);
+
+
+
+/* ==================================
+   TRACK SWITCH
+================================== */
+
+
+const btnCourse =
+document.getElementById(
+"btnCourse"
+);
+
+
+
+const btnComp =
+document.getElementById(
+"btnComp"
+);
+
+
+
+
+
+btnCourse.onclick=function(){
+
+
+btnCourse.classList.add(
+"active"
+);
+
+
+btnComp.classList.remove(
+"active"
+);
+
+
+
+iframe.src =
+agents[0].url;
+
+
+
+};
+
+
+
+
+
+
+
+btnComp.onclick=function(){
+
+
+btnComp.classList.add(
+"active"
+);
+
+
+btnCourse.classList.remove(
+"active"
+);
+
+
+
+iframe.src =
+agents[3].url;
+
+
+
+};
+
+
+
+
+
+
+
+
+/* ==================================
+   CONNECT EFFECT
+================================== */
+
+
+document
+.querySelectorAll(".card")
+.forEach(card=>{
+
+
+card.addEventListener(
+"mouseenter",
+()=>{
+
+
+card.style.transform=
+"translateY(-8px)";
+
+
+
+card.style.boxShadow=
+"0 0 40px rgba(80,200,255,.35)";
+
 
 
 }
+);
 
 
 
-drawNetwork();
+card.addEventListener(
+"mouseleave",
+()=>{
 
+
+card.style.transform="";
+
+card.style.boxShadow="";
+
+
+}
+);
+
+
+
+});
 
 
 
