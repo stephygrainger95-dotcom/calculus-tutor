@@ -9,10 +9,10 @@
 body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-serif;color:#e8f2fb;overflow-x:hidden;}
 
 /* =========== INTRO =========== */
-#intro{position:fixed;inset:0;z-index:9999;background:#040b18;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity .8s ease,transform .8s ease;overflow:hidden;cursor:pointer;}
+#intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 42% 40%,#101c40 0%,#070f26 55%,#04081a 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;transition:opacity .8s ease,transform .8s ease;overflow:hidden;cursor:pointer;}
 #intro.hide{opacity:0;transform:translateY(-30px);pointer-events:none;}
 #space{position:absolute;inset:0;}
-.boot-text{position:absolute;bottom:12vh;width:100%;text-align:center;font-family:Consolas,monospace;color:#82cfff;font-size:14px;letter-spacing:3px;z-index:2;transition:opacity .3s;}
+.boot-text{position:absolute;bottom:12vh;width:100%;text-align:center;font-family:Consolas,monospace;color:#9db4f0;font-size:14px;letter-spacing:3px;z-index:2;transition:opacity .3s;}
 .boot-text b{color:#55ff9b;font-weight:600;}
 .sys-title{position:relative;text-align:center;z-index:3;opacity:0;pointer-events:none;}
 .sys-title.reveal{animation:titleIn 1s cubic-bezier(.2,.7,.3,1) forwards;}
@@ -28,15 +28,22 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 #skip:hover{background:rgba(255,255,255,.15);}
 
 /* =========== 公共 =========== */
-.system-bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(135deg,#020611,#081a2d 55%,#04101f);}
-/* 柔和极光背景 */
+.system-bg{position:fixed;inset:0;z-index:-3;background:linear-gradient(135deg,#050d20,#0b1c38 50%,#0a1430);}
+/* 蓝紫极光背景（全局：首页+对话页共享） */
 .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;}
-.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;}
-.aurora .a1{width:55vw;height:55vw;left:-12vw;top:-18vw;background:radial-gradient(circle,#1b5f9e,transparent 70%);animation:auMove1 26s ease-in-out infinite alternate;}
-.aurora .a2{width:48vw;height:48vw;right:-14vw;top:8vh;background:radial-gradient(circle,#4a3a8e,transparent 70%);animation:auMove2 32s ease-in-out infinite alternate;}
-.aurora .a3{width:40vw;height:40vw;left:24vw;bottom:-22vw;background:radial-gradient(circle,#0f4d5e,transparent 70%);animation:auMove1 38s ease-in-out infinite alternate-reverse;}
+.aurora i{position:absolute;border-radius:50%;filter:blur(70px);}
+.aurora .a1{width:60vw;height:60vw;left:-14vw;top:-20vw;background:radial-gradient(circle,rgba(56,120,255,.5),transparent 68%);animation:auMove1 26s ease-in-out infinite alternate;}
+.aurora .a2{width:55vw;height:55vw;right:-16vw;top:4vh;background:radial-gradient(circle,rgba(139,92,246,.46),transparent 68%);animation:auMove2 32s ease-in-out infinite alternate;}
+.aurora .a3{width:46vw;height:46vw;left:22vw;bottom:-24vw;background:radial-gradient(circle,rgba(76,110,245,.4),transparent 68%);animation:auMove1 38s ease-in-out infinite alternate-reverse;}
+/* 极光光带：斜向缓慢流动 */
+.aurora .beam{width:130vw;height:34vh;left:-15vw;top:26vh;border-radius:0;filter:blur(60px);opacity:.16;
+  background:linear-gradient(100deg,transparent 8%,#3f7dff 32%,#9d6bff 55%,#4fc3ff 78%,transparent 94%);
+  animation:beamSway 24s ease-in-out infinite alternate;}
+@keyframes beamSway{from{transform:rotate(-9deg) translateY(-4vh);}to{transform:rotate(-4deg) translateY(6vh);}}
 @keyframes auMove1{from{transform:translate(0,0) scale(1);}to{transform:translate(6vw,4vh) scale(1.12);}}
 @keyframes auMove2{from{transform:translate(0,0) scale(1);}to{transform:translate(-5vw,6vh) scale(1.08);}}
+/* 全局星尘层 */
+#dust{position:fixed;inset:0;z-index:-1;pointer-events:none;}
 #app{display:flex;flex-direction:column;min-height:100vh;opacity:0;transition:1s;}
 #app.show{opacity:1;}
 
@@ -172,7 +179,8 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 
 <!-- =========== MAIN =========== -->
 <div class="system-bg"></div>
-<div class="aurora"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+<div class="aurora"><i class="a1"></i><i class="a2"></i><i class="a3"></i><i class="beam"></i></div>
+<canvas id="dust"></canvas>
 
 <div id="app">
   <header class="topbar">
@@ -311,6 +319,33 @@ body{background:#020611;font-family:"Microsoft YaHei","PingFang SC",Arial,sans-s
 </div>
 
 <script>
+/* ===== 全局星尘（首页/对话页背景） ===== */
+(function(){
+  var dc = document.getElementById("dust");
+  var dctx = dc.getContext("2d");
+  function dResize(){ dc.width = innerWidth; dc.height = innerHeight; }
+  dResize(); window.addEventListener("resize", dResize);
+  var ps = [];
+  for(var i=0;i<70;i++){
+    ps.push({x:Math.random(), y:Math.random(), r:Math.random()*1.8+0.5,
+             vy:Math.random()*0.00012+0.00004, tw:Math.random()*Math.PI*2,
+             c:Math.random()<0.5 ? "140,170,255" : "190,150,255"});
+  }
+  (function dustFrame(){
+    dctx.clearRect(0,0,dc.width,dc.height);
+    ps.forEach(function(p){
+      p.y -= p.vy; if(p.y < 0) p.y = 1;
+      p.tw += 0.02;
+      var a = 0.25 + Math.sin(p.tw)*0.2;
+      dctx.beginPath();
+      dctx.arc(p.x*dc.width, p.y*dc.height, p.r, 0, Math.PI*2);
+      dctx.fillStyle = "rgba(" + p.c + "," + a + ")";
+      dctx.fill();
+    });
+    requestAnimationFrame(dustFrame);
+  })();
+})();
+
 /* ===== INTRO：系统启动 → 智能体组网 → 标题显现 ===== */
 var intro = document.getElementById("intro");
 var app = document.getElementById("app");
@@ -343,11 +378,19 @@ function runIntro(){
   var t0 = performance.now();
   var bootText = document.getElementById("bootText");
   var sysTitle = document.getElementById("sysTitle");
-  // 背景星点
+  // 背景星点（蓝紫色调，缓慢漂移）
   var stars = [];
   for(var i=0;i<110;i++){
-    stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.6+0.4, s:Math.random()*0.00006+0.00002});
+    stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.5+0.4,
+                s:Math.random()*0.00005+0.000015,
+                c:Math.random()<0.5 ? "140,175,255" : "195,160,255"});
   }
+  // 蓝紫星云（呼吸感）
+  var NEBULA = [
+    {dx:-0.16, dy:-0.10, r:0.42, c:"70,110,235", ph:0},
+    {dx: 0.18, dy: 0.12, r:0.46, c:"140,95,235", ph:2.1},
+    {dx: 0.00, dy: 0.30, r:0.36, c:"60,140,220", ph:4.2}
+  ];
   // 4 个智能体节点（角度/颜色/名称/出现时刻）
   var NODES = [
     {a:-Math.PI*0.78, c:"#42cfff", label:"错题诊疗师",   at:0.95},
@@ -366,12 +409,22 @@ function runIntro(){
     var R = Math.min(W,H) * 0.26;
     ctx.clearRect(0,0,W,H);
 
+    // 星云底色
+    NEBULA.forEach(function(nb){
+      var br = nb.r * (1 + Math.sin(t*0.5 + nb.ph)*0.06);
+      var g = ctx.createRadialGradient(cx + nb.dx*W, cy + nb.dy*H, 0,
+                                       cx + nb.dx*W, cy + nb.dy*H, br*Math.min(W,H));
+      g.addColorStop(0, "rgba(" + nb.c + ",.14)");
+      g.addColorStop(1, "rgba(" + nb.c + ",0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+    });
     // 星点背景
     stars.forEach(function(s){
       s.y += s.s * H; if(s.y > 1) s.y = 0;
       ctx.beginPath();
       ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
-      ctx.fillStyle = "rgba(100,210,255,.5)";
+      ctx.fillStyle = "rgba(" + s.c + ",.55)";
       ctx.fill();
     });
 
@@ -385,8 +438,11 @@ function runIntro(){
     if(t < 2.0 || conv < 1){
       ctx.save();
       ctx.translate(cx, cy);
-      ctx.rotate(t * 1.6);
-      ctx.strokeStyle = "rgba(80,200,255,.55)";
+      ctx.rotate(t * 0.9);
+      var rg = ctx.createLinearGradient(-34, -34, 34, 34);
+      rg.addColorStop(0, "rgba(96,145,255,.7)");
+      rg.addColorStop(1, "rgba(170,120,255,.7)");
+      ctx.strokeStyle = rg;
       ctx.lineWidth = 1.5;
       ctx.setLineDash([46, 26]);
       ctx.beginPath();
@@ -394,12 +450,12 @@ function runIntro(){
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.restore();
-      // 中心核
-      var pulse = 3 + Math.sin(t*5)*1.2;
+      // 中心核（柔缓呼吸）
+      var pulse = 3 + Math.sin(t*2.6)*1.1;
       ctx.beginPath();
       ctx.arc(cx, cy, pulse, 0, Math.PI*2);
-      ctx.fillStyle = "#7fe8ff";
-      ctx.shadowColor = "#42d9ff"; ctx.shadowBlur = 18;
+      ctx.fillStyle = "#a9baff";
+      ctx.shadowColor = "#8b9dff"; ctx.shadowBlur = 20;
       ctx.fill();
       ctx.shadowBlur = 0;
     }
@@ -437,7 +493,7 @@ function runIntro(){
     // 相邻节点互联（组网感）
     if(t > 1.7 && nodePos[3].pop > 0){
       ctx.globalAlpha = Math.max(alpha,0) * ease((t-1.7)/0.3) * 0.4;
-      ctx.strokeStyle = "#7fb8dd"; ctx.lineWidth = 1;
+      ctx.strokeStyle = "#8fa3e8"; ctx.lineWidth = 1;
       for(var i=0;i<4;i++){
         var a = nodePos[i], b = nodePos[(i+1)%4];
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
